@@ -94,10 +94,10 @@ export const FolderStructureScene: React.FC = () => {
 
       {/* Description cards on the right for each folder group */}
       {[
-        { label: 'Domain prompts', sub: 'Each section of the PRD gets its own expert prompt', color: C.purple, y: grid.y(0.2), beatLabel: 'show-analytics' },
-        { label: 'Diagram standards', sub: 'Mermaid syntax, diagram types, labeling rules', color: C.teal, y: grid.y(0.38), beatLabel: 'show-architecture' },
-        { label: 'Brand consistency', sub: 'Colors, fonts, doc layout for every output', color: C.amber, y: grid.y(0.56), beatLabel: 'show-brand' },
-        { label: 'Automation', sub: 'PDF export, image gen, deployment scripts', color: C.green, y: grid.y(0.7), beatLabel: 'show-scripts' },
+        { label: 'Domain prompts', sub: 'Expert prompt per PRD section', color: C.purple, y: grid.y(0.2), beatLabel: 'show-analytics' },
+        { label: 'Diagram standards', sub: 'Mermaid syntax and labeling rules', color: C.teal, y: grid.y(0.38), beatLabel: 'show-architecture' },
+        { label: 'Brand consistency', sub: 'Colors, fonts, doc layout', color: C.amber, y: grid.y(0.56), beatLabel: 'show-brand' },
+        { label: 'Automation', sub: 'PDF, images, deploy scripts', color: C.green, y: grid.y(0.7), beatLabel: 'show-scripts' },
       ].map((desc, i) => {
         const dp = entranceSpring(frame, fps, beat(desc.beatLabel) + 6);
         const slideX = interpolate(dp, [0, 1], [20, 0]);
