@@ -19,21 +19,16 @@ const tree: FolderEntry[] = [
   { name: 'analytics/', indent: 1, isFolder: true, color: C.purple, beatLabel: 'show-analytics' },
   { name: 'events-framework.md', indent: 2, isFolder: false, color: C.purple, beatLabel: 'show-analytics' },
   { name: 'metrics-template.md', indent: 2, isFolder: false, color: C.purple, beatLabel: 'show-analytics' },
-  { name: 'dashboard-spec.md', indent: 2, isFolder: false, color: C.purple, beatLabel: 'show-analytics' },
   { name: 'architecture/', indent: 1, isFolder: true, color: C.teal, beatLabel: 'show-architecture' },
   { name: 'diagram-standards.md', indent: 2, isFolder: false, color: C.teal, beatLabel: 'show-architecture' },
-  { name: 'system-design.md', indent: 2, isFolder: false, color: C.teal, beatLabel: 'show-architecture' },
   { name: 'use-cases/', indent: 1, isFolder: true, color: C.blue, beatLabel: 'show-usecases' },
   { name: 'user-stories.md', indent: 2, isFolder: false, color: C.blue, beatLabel: 'show-usecases' },
-  { name: 'edge-cases.md', indent: 2, isFolder: false, color: C.blue, beatLabel: 'show-usecases' },
   { name: 'brand/', indent: 1, isFolder: true, color: C.amber, beatLabel: 'show-brand' },
   { name: 'colors.md', indent: 2, isFolder: false, color: C.amber, beatLabel: 'show-brand' },
   { name: 'typography.md', indent: 2, isFolder: false, color: C.amber, beatLabel: 'show-brand' },
-  { name: 'doc-format.md', indent: 2, isFolder: false, color: C.amber, beatLabel: 'show-brand' },
   { name: 'scripts/', indent: 1, isFolder: true, color: C.green, beatLabel: 'show-scripts' },
   { name: 'export-pdf.sh', indent: 2, isFolder: false, color: C.green, beatLabel: 'show-scripts' },
   { name: 'gen-mermaid.sh', indent: 2, isFolder: false, color: C.green, beatLabel: 'show-scripts' },
-  { name: 'deploy-notion.sh', indent: 2, isFolder: false, color: C.green, beatLabel: 'show-scripts' },
 ];
 
 export const FolderStructureScene: React.FC = () => {
@@ -43,7 +38,7 @@ export const FolderStructureScene: React.FC = () => {
 
   const treeX = grid.x(0.15);
   const treeY = grid.y(0.12);
-  const lineH = 36;
+  const lineH = 34;
 
   return (
     <g>
