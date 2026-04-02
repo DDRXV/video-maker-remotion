@@ -12,6 +12,8 @@ interface FlowArrowProps {
   dashed?: boolean;
   label?: string;
   curved?: boolean;
+  /** Right-angle elbow path — horizontal out, vertical turn, horizontal in */
+  elbow?: boolean;
   /** Custom path override (for complex routes) */
   path?: string;
   /** Arrowhead style */
@@ -36,6 +38,7 @@ export const FlowArrow: React.FC<FlowArrowProps> = ({
   dashed = false,
   label,
   curved = false,
+  elbow = false,
   path: customPath,
   arrowStyle = 'open',
   curvature,
@@ -54,6 +57,33 @@ export const FlowArrow: React.FC<FlowArrowProps> = ({
 
   if (customPath) {
     d = customPath;
+  } else if (elbow) {
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const r = 24; // generous corner radius for smooth turns
+
+    if (absDy < 30) {
+      // Nearly horizontal — straight line
+      d = `M ${from.x} ${from.y} L ${to.x} ${to.y}`;
+    } else if (absDx < 30) {
+      // Nearly vertical — straight line
+      d = `M ${from.x} ${from.y} L ${to.x} ${to.y}`;
+    } else {
+      const signX = dx >= 0 ? 1 : -1;
+      const signY = dy >= 0 ? 1 : -1;
+      // Clamp radius so it never exceeds half the shorter segment
+      const rX = Math.min(r, absDx * 0.4);
+      const rY = Math.min(r, absDy * 0.4);
+      const rUse = Math.min(rX, rY);
+
+      if (absDx >= absDy) {
+        // Horizontal out, turn near target column, vertical into target
+        d = `M ${from.x} ${from.y} H ${to.x - rUse * signX} Q ${to.x} ${from.y} ${to.x} ${from.y + rUse * signY} V ${to.y}`;
+      } else {
+        // Vertical out, turn near target row, horizontal into target
+        d = `M ${from.x} ${from.y} V ${to.y - rUse * signY} Q ${from.x} ${to.y} ${from.x + rUse * signX} ${to.y} H ${to.x}`;
+      }
+    }
   } else if (curved || curvature) {
     // Cubic bezier — smooth architectural curve
     // Control points offset perpendicular to the line
@@ -91,7 +121,16 @@ export const FlowArrow: React.FC<FlowArrowProps> = ({
   // Compute the actual arrival angle at the endpoint
   // For curved paths, use the last segment direction
   let arrivalAngle = angle;
-  if (curved || curvature) {
+  if (elbow) {
+    // Elbow arrows arrive either horizontally or vertically
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    if (absDx >= absDy) {
+      arrivalAngle = dx >= 0 ? 0 : Math.PI; // arrives horizontally
+    } else {
+      arrivalAngle = dy >= 0 ? Math.PI / 2 : -Math.PI / 2; // arrives vertically
+    }
+  } else if (curved || curvature) {
     // Approximate by using the direction from the second control point to the end
     const curve = curvature ?? dist * 0.25;
     const perpA = angle - Math.PI / 2;
