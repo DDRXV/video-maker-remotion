@@ -43,9 +43,9 @@ const sections: ScriptSection[] = [
       { label: 'show-query-embedding', atFraction: 0.50 },
       { label: 'show-similarity', atFraction: 0.58 },
       { label: 'show-top-matches', atFraction: 0.65 },
-      { label: 'show-llm', atFraction: 0.74 },
-      { label: 'show-answer', atFraction: 0.82 },
-      { label: 'show-summary', atFraction: 0.92 },
+      { label: 'show-llm', atFraction: 0.68 },
+      { label: 'show-answer', atFraction: 0.76 },
+      { label: 'show-summary', atFraction: 0.84 },
     ],
   },
   {
