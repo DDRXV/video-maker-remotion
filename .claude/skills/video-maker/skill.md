@@ -58,25 +58,47 @@ Build each scene with custom inline SVG illustrations specific to the video's co
 ### Step 5: Wire Composition
 Create the composition file that imports all scenes, maps them to `<Sequence>` blocks driven by script.ts timing, and wraps each in `SceneCanvas`.
 
-### Step 6: Visual QA — Screenshot Every Scene
-**Mandatory before showing the user.** Render still frames and review them.
+### Step 6: Visual QA — Screenshot Every Beat
+**Mandatory before showing the user.** Render still frames at EVERY beat of EVERY scene and review them.
 
-1. For each scene, pick 2-3 key beat frames (mid-point and final beat).
-2. Render stills:
+1. **Render ALL beats, not just 2-3.** For each scene, render a still at every beat frame:
    ```bash
-   npx remotion still src/index.ts <CompositionId> /tmp/<scene>-<beat>.png --frame=<N>
+   # Calculate frame: sceneStartFrame + atFraction * sceneDuration
+   # With audio, use calculateMetadata durations. Without, use static durations.
+   for f in <frame1> <frame2> ...; do
+     npx remotion still src/index.ts <CompositionId> /tmp/<scene>-${f}.png --frame=${f} 2>&1 | tail -1
+   done
    ```
-3. Read each PNG and review it using the full Visual QA Review prompt in [references/visual-qa-review.md](references/visual-qa-review.md). This covers:
-   - AI-slop color detection (no gradients, no neon blues, no saturated rainbow)
-   - AI-ish text detection (no em dashes, no spanner verbs, no marketing-speak)
-   - Scene detailing check (every card must show internal content, not just labels)
-   - Layout and composition (canvas usage, balance, text overflow, alignment)
-   - Video-specific readability (720p test, compression survival, contrast ratios)
-   - Premium benchmark comparison (ByteByteGo, Notion, 3B1B, Stripe)
 
-4. For each scene, output the structured review format from the reference doc (issues, verdict, priority fixes).
+2. **Read EVERY screenshot** and check for these specific issues:
 
-5. Fix all FAIL scenes, re-render, and re-review until all scenes pass.
+   **Text overflow (most common failure):**
+   - Does any text extend past its container border?
+   - Do labels overlap scores or other text?
+   - Is monospace text wider than expected? (monospace is 20-30% wider than sans-serif)
+   - Calculate: `charCount * fontSize * 0.6` for monospace, compare to container width - 24px
+
+   **Arrow alignment:**
+   - Are arrows between same-height elements perfectly horizontal? (both Y coords identical)
+   - Are diagonal arrows only used when elements are at genuinely different Y positions?
+   - Are arrows inside the same transform group as their connected elements?
+
+   **Shape authenticity:**
+   - Is every element shaped like what it represents? (No generic circles)
+   - Does every container show what's inside it? (No empty labeled boxes)
+
+   **Readability at 720p:**
+   - Is any text below 14px? (12px absolute minimum for monospace code only)
+   - Will light-colored text survive YouTube compression?
+   - Are more than 5 elements competing for attention?
+
+   **View transitions (for multi-view scenes):**
+   - Does the crossfade between views actually work at the transition frame?
+   - Is the recap/zoomed-out view rendering correctly at the end?
+
+3. **Fix ALL issues found**, re-render the affected frames, re-verify.
+
+4. **Do not show the user until all beats pass.** Every frame they might pause on must look correct.
 
 **Scene detailing rule (critical):** Every card, box, or container must show what is inside it. What "inside" looks like depends on the concept. Figure it out from the subject matter. Empty labeled boxes are the #1 sign of generic AI output.
 
