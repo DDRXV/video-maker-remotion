@@ -151,11 +151,11 @@ const View1: React.FC<{ opacity: number }> = ({ opacity }) => {
   const chunkGap = 16;
 
   const sections = [
-    { num: 1, title: 'Section 1: Overview', text: 'All purchases are subject to our refund terms and conditions...' },
-    { num: 2, title: 'Section 2: Eligibility', text: 'Monthly plan subscribers may request a full refund within...' },
-    { num: 3, title: 'Section 3: Annual Plans', text: 'Annual subscriptions are billed upfront for the full year...' },
-    { num: 4, title: 'Section 4.2: Refund Calculation', text: 'Pro-rated refund minus two months of service used...', hl: true },
-    { num: 5, title: 'Section 5: Exceptions', text: 'Enterprise contracts with custom terms are excluded...' },
+    { num: 1, title: 'Section 1: Overview', text: 'All purchases subject to refund terms...' },
+    { num: 2, title: 'Section 2: Eligibility', text: 'Monthly plans: full refund within 30d...' },
+    { num: 3, title: 'Section 3: Annual Plans', text: 'Annual subs billed upfront for full year...' },
+    { num: 4, title: 'Section 4.2: Refund Calc', text: 'Pro-rated refund minus 2 months used...', hl: true },
+    { num: 5, title: 'Section 5: Exceptions', text: 'Enterprise custom terms excluded...' },
   ];
 
   return (
@@ -254,13 +254,13 @@ const View2: React.FC<{ opacity: number }> = ({ opacity }) => {
 
   const embX = grid.x(0.02);
   const embY = grid.y(0.14);
-  const embW = 440;
+  const embW = 420;
   const embH = 340;
 
   const dbX = grid.x(0.54);
-  const dbY = grid.y(0.1);
-  const dbW = 380;
-  const dbH = 420;
+  const dbY = grid.y(0.14);
+  const dbW = grid.x(0.96) - dbX;
+  const dbH = 340;
 
   return (
     <g style={{ opacity }}>
@@ -289,7 +289,7 @@ const View2: React.FC<{ opacity: number }> = ({ opacity }) => {
 
               {/* LEFT: Input — chunk text */}
               <text x={embX + 20} y={embY + 60} fill={P.textLight} fontSize={14} fontWeight={600}>TEXT IN</text>
-              {['§1 "All purchases subject to..."', '§2 "Monthly plan subscribers..."', '§3 "Annual subscriptions..."', '§4.2 "Pro-rated refund minus..."', '§5 "Enterprise contracts..."'].map((t, i) => {
+              {['§1 "All purchases..."', '§2 "Monthly plans..."', '§3 "Annual subs..."', '§4.2 "Pro-rated..."', '§5 "Enterprise..."'].map((t, i) => {
                 const lp = snappySpring(frame, fps, beat('show-embedding-model') + 6 + i * 4);
                 return (
                   <g key={i} style={{ opacity: lp }}>
@@ -304,7 +304,7 @@ const View2: React.FC<{ opacity: number }> = ({ opacity }) => {
 
               {/* RIGHT: Output — vectors */}
               <text x={embX + embW / 2 + 20} y={embY + 60} fill={P.textLight} fontSize={14} fontWeight={600}>NUMBERS OUT</text>
-              {['[0.82, 0.11, -0.34, 0.67, ...]', '[0.45, -0.67, 0.23, 0.12, ...]', '[-0.12, 0.91, 0.55, -0.33, ...]', '[0.23, -0.41, 0.87, 0.05, ...]', '[0.67, 0.33, -0.15, 0.44, ...]'].map((v, i) => {
+              {['[0.82, 0.11, ...]', '[0.45, -0.67, ...]', '[-0.12, 0.91, ...]', '[0.23, -0.41, ...]', '[0.67, 0.33, ...]'].map((v, i) => {
                 const vp = snappySpring(frame, fps, beat('show-vectors') + i * 3);
                 const isHL = i === 3;
                 return (
@@ -322,9 +322,9 @@ const View2: React.FC<{ opacity: number }> = ({ opacity }) => {
         })()}
       </g>
 
-      {/* Arrow to DB */}
+      {/* Arrow to DB — horizontal */}
       {pDB > 0.05 && (
-        <Arrow x1={embX + embW + 10} y1={embY + embH / 2} x2={dbX - 10} y2={dbY + dbH / 2}
+        <Arrow x1={embX + embW + 10} y1={embY + embH / 2} x2={dbX - 10} y2={embY + embH / 2}
           label="store" color={P.blue} enterAt={beat('show-vector-db')} />
       )}
 
@@ -352,11 +352,11 @@ const View2: React.FC<{ opacity: number }> = ({ opacity }) => {
 
               {/* Rows */}
               {[
-                { c: '§1 Overview', v: '[0.82, 0.11, -0.34, 0.67, ...]' },
-                { c: '§2 Eligibility', v: '[0.45, -0.67, 0.23, 0.12, ...]' },
-                { c: '§3 Annual', v: '[-0.12, 0.91, 0.55, -0.33, ...]' },
-                { c: '§4.2 Refund', v: '[0.23, -0.41, 0.87, 0.05, ...]' },
-                { c: '§5 Exceptions', v: '[0.67, 0.33, -0.15, 0.44, ...]' },
+                { c: '§1 Overview', v: '[0.82, 0.11, ...]' },
+                { c: '§2 Eligibility', v: '[0.45, -0.67, ...]' },
+                { c: '§3 Annual', v: '[-0.12, 0.91, ...]' },
+                { c: '§4.2 Refund', v: '[0.23, -0.41, ...]' },
+                { c: '§5 Exceptions', v: '[0.67, 0.33, ...]' },
               ].map((row, i) => {
                 const rp = snappySpring(frame, fps, beat('show-vector-db') + 4 + i * 4);
                 const ry = dbY + ery + 50 + i * 54;
@@ -393,10 +393,10 @@ const View3: React.FC<{ opacity: number }> = ({ opacity }) => {
   const pMatch = entranceSpring(frame, fps, beat('show-top-matches'));
 
   const queryX = grid.x(0.02);
-  const queryY = grid.y(0.2);
-  const simX = grid.x(0.38);
-  const simY = grid.y(0.14);
-  const matchX = grid.x(0.74);
+  const queryY = grid.y(0.16);
+  const simX = grid.x(0.3);
+  const simY = grid.y(0.16);
+  const matchX = grid.x(0.66);
 
   return (
     <g style={{ opacity }}>
@@ -441,9 +441,9 @@ const View3: React.FC<{ opacity: number }> = ({ opacity }) => {
         })()}
       </g>
 
-      {/* Arrow to similarity */}
+      {/* Arrow to similarity — horizontal */}
       {pSim > 0.05 && (
-        <Arrow x1={queryX + 328} y1={queryY + 80} x2={simX - 10} y2={simY + 160}
+        <Arrow x1={queryX + 328} y1={queryY + 80} x2={simX - 10} y2={queryY + 80}
           label="compare" color={P.brand} enterAt={beat('show-similarity')} />
       )}
 
@@ -453,8 +453,8 @@ const View3: React.FC<{ opacity: number }> = ({ opacity }) => {
         {[
           { l: '§1 Overview', s: '0.61' },
           { l: '§2 Eligibility', s: '0.54' },
-          { l: '§3 Annual plans', s: '0.78' },
-          { l: '§4.2 Refund calculation', s: '0.94', best: true },
+          { l: '§3 Annual', s: '0.78' },
+          { l: '§4.2 Refund', s: '0.94', best: true },
           { l: '§5 Exceptions', s: '0.42' },
         ].map((sc, i) => {
           const sp = snappySpring(frame, fps, beat('show-similarity') + 4 + i * 4);
@@ -472,9 +472,9 @@ const View3: React.FC<{ opacity: number }> = ({ opacity }) => {
         })}
       </g>
 
-      {/* Arrow to matches */}
+      {/* Arrow to matches — horizontal */}
       {pMatch > 0.05 && (
-        <Arrow x1={simX + 308} y1={simY + 160} x2={matchX - 10} y2={simY + 160}
+        <Arrow x1={simX + 308} y1={simY + 150} x2={matchX - 10} y2={simY + 150}
           label="top-3" color={P.green} enterAt={beat('show-top-matches')} />
       )}
 
@@ -595,9 +595,9 @@ const View4: React.FC<{ opacity: number }> = ({ opacity }) => {
         })()}
       </g>
 
-      {/* Arrow to answer */}
+      {/* Arrow to answer — horizontal */}
       {pAns > 0.05 && (
-        <Arrow x1={llmX + llmW + 10} y1={llmY + llmH / 2} x2={ansX - 10} y2={ansY + 120}
+        <Arrow x1={llmX + llmW + 10} y1={llmY + llmH / 2} x2={ansX - 10} y2={llmY + llmH / 2}
           color={P.green} enterAt={beat('show-answer')} />
       )}
 
