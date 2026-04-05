@@ -62,7 +62,7 @@ export const FullPictureScene: React.FC = () => {
   const totalW = grid.x(0.84);
   const startX = grid.x(0.08);
   const blockCount = 6;
-  const gap = 12;
+  const gap = 28;
   const blockW = (totalW - gap * (blockCount - 1)) / blockCount;
 
   const modules = [
@@ -96,10 +96,11 @@ export const FullPictureScene: React.FC = () => {
         <text x={grid.center().x} y={grid.y(0.03)} textAnchor="middle" fill={C.dark} fontSize={FONT_SIZE['2xl']} fontWeight={700} fontFamily={TYPOGRAPHY.heading.fontFamily}>The Complete System</text>
       </g>
 
-      {/* Question label */}
+      {/* Question label + arrow */}
       <g style={{ opacity: diagP }}>
-        <text x={startX - 16} y={pipeY + pipeH / 2 + 1} textAnchor="end" dominantBaseline="central" fill={C.blue} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>Question</text>
-        <FlowArrow from={{ x: startX - 14, y: pipeY + pipeH / 2 }} to={{ x: startX - 4, y: pipeY + pipeH / 2 }} enterAt={beat('show-full-diagram')} color={C.blue} strokeWidth={1.5} />
+        <text x={startX - 28} y={pipeY + pipeH / 2 + 1} textAnchor="end" dominantBaseline="central" fill={C.blue} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>Question</text>
+        <line x1={startX - 24} y1={pipeY + pipeH / 2} x2={startX - 8} y2={pipeY + pipeH / 2} stroke={C.blue} strokeWidth={1.5} strokeLinecap="round" />
+        <polygon points={`${startX - 2},${pipeY + pipeH / 2} ${startX - 9},${pipeY + pipeH / 2 - 4} ${startX - 9},${pipeY + pipeH / 2 + 4}`} fill={C.blue} />
       </g>
 
       {/* Pipeline blocks */}
@@ -114,23 +115,30 @@ export const FullPictureScene: React.FC = () => {
         );
       })}
 
-      {/* Answer label */}
-      <g style={{ opacity: diagP }}>
-        <FlowArrow from={{ x: startX + blockCount * (blockW + gap) - gap + 4, y: pipeY + pipeH / 2 }} to={{ x: startX + blockCount * (blockW + gap) - gap + 14, y: pipeY + pipeH / 2 }} enterAt={beat('show-full-diagram')} color={C.success} strokeWidth={1.5} />
-        <text x={startX + blockCount * (blockW + gap) - gap + 18} y={pipeY + pipeH / 2 + 1} dominantBaseline="central" fill={C.success} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>Answer</text>
-      </g>
-
-      {/* Arrows between blocks */}
-      {modules.slice(0, -1).map((_, i) => {
-        const fromX = startX + (i + 1) * (blockW + gap) - gap;
-        const toX = startX + (i + 1) * (blockW + gap);
+      {/* Answer label + arrow */}
+      {(() => {
+        const lastBlockRight = startX + blockCount * (blockW + gap) - gap + 4;
+        const ansArrowEnd = lastBlockRight + 24;
+        const ay = pipeY + pipeH / 2;
         return (
-          <FlowArrow
-            key={`a-${i}`}
-            from={{ x: fromX, y: pipeY + pipeH / 2 }}
-            to={{ x: toX, y: pipeY + pipeH / 2 }}
-            enterAt={beat('show-full-diagram')} color={C.cardStroke} strokeWidth={1.5}
-          />
+          <g style={{ opacity: diagP }}>
+            <line x1={lastBlockRight} y1={ay} x2={ansArrowEnd - 8} y2={ay} stroke={C.success} strokeWidth={1.5} strokeLinecap="round" />
+            <polygon points={`${ansArrowEnd},${ay} ${ansArrowEnd - 7},${ay - 4} ${ansArrowEnd - 7},${ay + 4}`} fill={C.success} />
+            <text x={ansArrowEnd + 8} y={ay + 1} dominantBaseline="central" fill={C.success} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>Answer</text>
+          </g>
+        );
+      })()}
+
+      {/* Straight horizontal arrows between blocks */}
+      {modules.slice(0, -1).map((_, i) => {
+        const fromX = startX + (i + 1) * (blockW + gap) - gap + 4;
+        const toX = startX + (i + 1) * (blockW + gap) - 4;
+        const ay = pipeY + pipeH / 2;
+        return (
+          <g key={`a-${i}`} style={{ opacity: diagP }}>
+            <line x1={fromX} y1={ay} x2={toX - 8} y2={ay} stroke={C.cardStroke} strokeWidth={1.5} strokeLinecap="round" />
+            <polygon points={`${toX},${ay} ${toX - 7},${ay - 4} ${toX - 7},${ay + 4}`} fill={C.cardStroke} />
+          </g>
         );
       })}
 
@@ -143,20 +151,24 @@ export const FullPictureScene: React.FC = () => {
         />
       )}
 
-      {/* Self-correction loop */}
+      {/* Self-correction loop — box-style L-shaped path, well below blocks */}
       {frame >= beat('animate-flow') && (() => {
-        const genCX = startX + 5 * (blockW + gap) + blockW / 2;
-        const qtCX = startX + 2 * (blockW + gap) + blockW / 2;
-        const loopBottomY = pipeY + pipeH + 50;
+        const genRight = startX + 5 * (blockW + gap) + blockW / 2;
+        const qtLeft = startX + 2 * (blockW + gap) + blockW / 2;
+        const loopY = pipeY + pipeH + 14;
+        const loopBottomY = pipeY + pipeH + 46;
+        const r = 12; // corner radius
         const lp = entranceSpring(frame, fps, beat('animate-flow'));
+        // Box path: down from gen, horizontal left, up to qt
+        const d = `M ${genRight} ${loopY} L ${genRight} ${loopBottomY - r} Q ${genRight} ${loopBottomY} ${genRight - r} ${loopBottomY} L ${qtLeft + r} ${loopBottomY} Q ${qtLeft} ${loopBottomY} ${qtLeft} ${loopBottomY - r} L ${qtLeft} ${loopY}`;
         return (
-          <g style={{ opacity: lp * 0.7 }}>
-            <path
-              d={`M ${genCX} ${pipeY + pipeH} C ${genCX} ${loopBottomY + 16}, ${qtCX} ${loopBottomY + 16}, ${qtCX} ${pipeY + pipeH}`}
-              fill="none" stroke={C.generation} strokeWidth={2} strokeDasharray="6 4" strokeLinecap="round"
-            />
-            <polygon points={`${qtCX},${pipeY + pipeH} ${qtCX - 5},${pipeY + pipeH + 8} ${qtCX + 5},${pipeY + pipeH + 8}`} fill={C.generation} />
-            <text x={(genCX + qtCX) / 2} y={loopBottomY + 22} textAnchor="middle" fill={C.generation} fontSize={FONT_SIZE.xs} fontFamily="monospace" fillOpacity={0.8}>self-correction loop</text>
+          <g style={{ opacity: lp * 0.6 }}>
+            <path d={d} fill="none" stroke={C.generation} strokeWidth={1.5} strokeDasharray="6 4" strokeLinecap="round" />
+            {/* Arrowhead pointing up at qt */}
+            <polygon points={`${qtLeft},${loopY - 2} ${qtLeft - 4},${loopY + 6} ${qtLeft + 4},${loopY + 6}`} fill={C.generation} />
+            {/* Label centered on bottom segment */}
+            <rect x={(genRight + qtLeft) / 2 - 70} y={loopBottomY - 12} width={140} height={20} rx={4} fill={C.bg} />
+            <text x={(genRight + qtLeft) / 2} y={loopBottomY} textAnchor="middle" dominantBaseline="central" fill={C.generation} fontSize={12} fontFamily="monospace" fillOpacity={0.8}>self-correction loop</text>
           </g>
         );
       })()}
