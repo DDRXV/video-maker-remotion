@@ -348,6 +348,23 @@ Don't label a transformation — SHOW it. Examples:
 
 **Never use DashFlow across a pipeline.** DashFlow draws a continuous dashed line from start to end — it passes straight through blocks in between. For pipeline flow animation, use staggered block entrances instead.
 
+**Feedback/self-correction loops — always L-shaped, never curved:**
+- Never use cubic bezier `C` command for feedback loops. Curved arcs look imprecise and overlap with blocks.
+- Always use L-shaped box paths with `Q` (quadratic) corners for 90-degree turns:
+```tsx
+// L-shaped loop: down from source, horizontal, up to target
+const r = 14; // corner radius
+const d = `M ${fromX} ${fromY}
+  L ${fromX} ${bottomY - r}
+  Q ${fromX} ${bottomY} ${fromX - r} ${bottomY}
+  L ${toX + r} ${bottomY}
+  Q ${toX} ${bottomY} ${toX} ${bottomY - r}
+  L ${toX} ${toY}`;
+```
+- Push the loop bottom at least 40px below (or above) the pipeline blocks so lines don't overlap.
+- Add a label with a background rect on the horizontal segment.
+- Use `strokeDasharray="6 4"` for dashed loop lines, opacity 0.5-0.6.
+
 **SVG image preserveAspectRatio:**
 - Use `preserveAspectRatio="xMinYMin meet"` to show full image without cropping.
 - Never use `"xMidYMid slice"` for screenshots or reference images — it crops edges.
