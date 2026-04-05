@@ -1,0 +1,1 @@
+I typed "Plan the launch for our new AI writing tool." One prompt. Claude spawned four agents. One researched competitors. One drafted a press release. One built a 6-week timeline. One wrote landing page copy. All four ran at the same time. Fifteen seconds later, I had a complete launch plan. This is multi-agent orchestration.

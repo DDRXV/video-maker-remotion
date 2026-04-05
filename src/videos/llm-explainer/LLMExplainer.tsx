@@ -5,6 +5,8 @@ import { script } from './script';
 import { Background } from '../../components/Background';
 import { SvgFilters } from '../../design-system/filters';
 import { BBG } from './styles';
+import { MavenCTAScene } from '../../components/MavenCTAScene';
+import { withCTASections } from '../../utils/withCTA';
 import { HookScene } from './scenes/hook';
 import { NumbersScene } from './scenes/numbers';
 import { TokenizationScene } from './scenes/tokenization';
@@ -14,16 +16,16 @@ import { AttentionScene } from './scenes/attention';
 import { GenerationScene } from './scenes/generation';
 import { FullPictureScene } from './scenes/fullPicture';
 
-const scenes = [
-  { id: 'hook', Component: HookScene },
-  { id: 'numbers', Component: NumbersScene },
-  { id: 'tokenization', Component: TokenizationScene },
-  { id: 'embedding', Component: EmbeddingScene },
-  { id: 'transformer', Component: TransformerScene },
-  { id: 'attention', Component: AttentionScene },
-  { id: 'generation', Component: GenerationScene },
-  { id: 'full-picture', Component: FullPictureScene },
-];
+const sceneComponents: Record<string, React.FC> = {
+  'hook': HookScene,
+  'numbers': NumbersScene,
+  'tokenization': TokenizationScene,
+  'embedding': EmbeddingScene,
+  'transformer': TransformerScene,
+  'attention': AttentionScene,
+  'generation': GenerationScene,
+  'full-picture': FullPictureScene,
+};
 
 const SceneCanvas: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AbsoluteFill>
@@ -35,12 +37,22 @@ const SceneCanvas: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </AbsoluteFill>
 );
 
+const allSections = withCTASections(script);
+
 export const LLMExplainer: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: BBG.bg, fontFamily: 'Inter, sans-serif' }}>
-    {scenes.map(({ id, Component }) => {
-      const section = script.find(s => s.id === id)!;
+    {allSections.map(({ id, startFrame, durationInFrames, title }) => {
+      if (id === 'mid-cta' || id === 'end-cta') {
+        return (
+          <Sequence key={id} from={startFrame} durationInFrames={durationInFrames} name={title}>
+            <MavenCTAScene variant={id === 'mid-cta' ? 'mid' : 'end'} />
+          </Sequence>
+        );
+      }
+      const Component = sceneComponents[id];
+      if (!Component) return null;
       return (
-        <Sequence key={id} from={section.startFrame} durationInFrames={section.durationInFrames} name={section.title}>
+        <Sequence key={id} from={startFrame} durationInFrames={durationInFrames} name={title}>
           <SceneCanvas><Component /></SceneCanvas>
         </Sequence>
       );

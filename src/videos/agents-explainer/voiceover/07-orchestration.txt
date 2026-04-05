@@ -1,0 +1,1 @@
+The main agent is the orchestrator. It reads the launch request, breaks it into four independent workstreams, spawns an agent for each, collects the results, and synthesizes them into one coherent launch plan. It is like a PM who assigns work to four specialists and reviews their output. The main agent plans, delegates, and synthesizes.

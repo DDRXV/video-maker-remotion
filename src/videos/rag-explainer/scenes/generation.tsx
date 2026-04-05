@@ -121,7 +121,7 @@ export const GenerationScene: React.FC = () => {
   // Highlight box
   const hlX = grid.x(0.62);
   const hlY = grid.y(0.18);
-  const hlW = grid.x(0.36);
+  const hlW = grid.x(0.96) - hlX;
   const hlH = 180;
 
   return (

@@ -19,7 +19,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({ x, y, width, height,
 
   return (
     <g style={{ opacity: progress, transform: `translateY(${translateY}px)` }}>
-      {clipContent && <defs><clipPath id={clipId}><rect x={x} y={y} width={width} height={height} rx={12} /></clipPath></defs>}
+      {clipContent && <defs><clipPath id={clipId}><rect x={0} y={-headerHeight} width={width} height={height} rx={12} /></clipPath></defs>}
       {shadow && <rect x={x + 2} y={y + 3} width={width} height={height} rx={12} fill={COLORS.dark} fillOpacity={0.06} />}
       <rect x={x} y={y} width={width} height={height} rx={12} fill={fill} stroke={strokeColor} strokeWidth={strokeWidth} />
       {title && (<>

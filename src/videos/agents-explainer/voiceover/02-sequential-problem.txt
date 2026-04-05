@@ -1,0 +1,1 @@
+Without agents, Claude works like a single thread. It researches competitors, waits, then drafts the press release, waits, then builds the timeline. Every task blocks the next one. Four independent tasks done one by one. The bottleneck is not intelligence. It is the sequential execution model.

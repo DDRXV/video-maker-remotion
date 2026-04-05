@@ -4,6 +4,8 @@ import { COLORS, CANVAS } from '../../design-system/tokens';
 import { script } from './script';
 import { Background } from '../../components/Background';
 import { SvgFilters } from '../../design-system/filters';
+import { MavenCTAScene } from '../../components/MavenCTAScene';
+import { withCTASections } from '../../utils/withCTA';
 import { HookScene } from './scenes/hook';
 import { OverviewScene } from './scenes/overview';
 import { QueryConstructionScene } from './scenes/queryConstruction';
@@ -14,17 +16,17 @@ import { RetrievalScene } from './scenes/retrieval';
 import { GenerationScene } from './scenes/generation';
 import { FullPictureScene } from './scenes/fullPicture';
 
-const scenes = [
-  { id: 'hook', Component: HookScene },
-  { id: 'overview', Component: OverviewScene },
-  { id: 'query-construction', Component: QueryConstructionScene },
-  { id: 'query-translation', Component: QueryTranslationScene },
-  { id: 'routing', Component: RoutingScene },
-  { id: 'indexing', Component: IndexingScene },
-  { id: 'retrieval', Component: RetrievalScene },
-  { id: 'generation', Component: GenerationScene },
-  { id: 'full-picture', Component: FullPictureScene },
-];
+const sceneComponents: Record<string, React.FC> = {
+  'hook': HookScene,
+  'overview': OverviewScene,
+  'query-construction': QueryConstructionScene,
+  'query-translation': QueryTranslationScene,
+  'routing': RoutingScene,
+  'indexing': IndexingScene,
+  'retrieval': RetrievalScene,
+  'generation': GenerationScene,
+  'full-picture': FullPictureScene,
+};
 
 const SceneCanvas: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AbsoluteFill>
@@ -36,12 +38,22 @@ const SceneCanvas: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </AbsoluteFill>
 );
 
+const allSections = withCTASections(script);
+
 export const RAGExplainer: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: COLORS.background, fontFamily: 'Inter, sans-serif' }}>
-    {scenes.map(({ id, Component }) => {
-      const section = script.find(s => s.id === id)!;
+    {allSections.map(({ id, startFrame, durationInFrames, title }) => {
+      if (id === 'mid-cta' || id === 'end-cta') {
+        return (
+          <Sequence key={id} from={startFrame} durationInFrames={durationInFrames} name={title}>
+            <MavenCTAScene variant={id === 'mid-cta' ? 'mid' : 'end'} />
+          </Sequence>
+        );
+      }
+      const Component = sceneComponents[id];
+      if (!Component) return null;
       return (
-        <Sequence key={id} from={section.startFrame} durationInFrames={section.durationInFrames} name={section.title}>
+        <Sequence key={id} from={startFrame} durationInFrames={durationInFrames} name={title}>
           <SceneCanvas><Component /></SceneCanvas>
         </Sequence>
       );

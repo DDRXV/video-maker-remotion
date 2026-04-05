@@ -1,10 +1,25 @@
 import { useCurrentFrame, useVideoConfig } from 'remotion';
 import { entranceSpring } from '../design-system/easing';
 
-interface Beat { label: string; atFrame: number; }
-interface ScriptSection { id: string; title: string; narration: string; startFrame: number; durationInFrames: number; beats: Beat[]; }
+interface BeatLegacy { label: string; atFrame: number; }
+interface BeatProportional { label: string; atFraction: number; }
+type BeatAny = BeatLegacy | BeatProportional;
+
+interface ScriptSection {
+  id: string;
+  title: string;
+  narration: string;
+  startFrame: number;
+  durationInFrames: number;
+  beats: BeatAny[];
+}
 
 type GetSection = (id: string) => ScriptSection;
+
+function resolveBeatFrame(b: BeatAny, sectionDuration: number): number {
+  if ('atFrame' in b) return b.atFrame;
+  return Math.round(b.atFraction * sectionDuration);
+}
 
 export function createUseScene(getSection: GetSection) {
   return function useScene(sectionId: string) {
@@ -15,7 +30,7 @@ export function createUseScene(getSection: GetSection) {
     const beat = (label: string): number => {
       const b = section.beats.find((b) => b.label === label);
       if (!b) { console.warn(`Beat "${label}" not found in "${sectionId}"`); return 0; }
-      return b.atFrame;
+      return resolveBeatFrame(b, section.durationInFrames);
     };
 
     const progress = (label: string): number => entranceSpring(frame, fps, beat(label));

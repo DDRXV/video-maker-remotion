@@ -1,0 +1,1 @@
+Not all agents are the same. Claude Code has specialized agent types. Explore agents are fast and focused on searching. Plan agents design strategies. Security agents review for vulnerabilities. General-purpose agents handle anything. Each type has access to different tools. You pick the type that matches the job.

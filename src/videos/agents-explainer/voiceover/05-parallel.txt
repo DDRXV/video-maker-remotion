@@ -1,0 +1,1 @@
+Here is what happens with our launch plan. Claude sends all four agent requests in a single message. Competitor research, press release, timeline, and landing page copy all start at the same time. They run in parallel. The main agent does not wait for the competitor research to finish before starting the press release. Fifteen seconds of wall time instead of sixty.

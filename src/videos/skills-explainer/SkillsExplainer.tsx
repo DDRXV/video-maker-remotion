@@ -5,6 +5,8 @@ import { script } from './script';
 import { Background } from '../../components/Background';
 import { SvgFilters } from '../../design-system/filters';
 import { C } from './styles';
+import { MavenCTAScene } from '../../components/MavenCTAScene';
+import { withCTASections } from '../../utils/withCTA';
 import { HookScene } from './scenes/hook';
 import { WhatIsSkillScene } from './scenes/whatIsSkill';
 import { SkillFileScene } from './scenes/skillFile';
@@ -15,17 +17,17 @@ import { BrandScene } from './scenes/brand';
 import { ActivationScene } from './scenes/activation';
 import { FullPictureScene } from './scenes/fullPicture';
 
-const scenes = [
-  { id: 'hook', Component: HookScene },
-  { id: 'what-is-skill', Component: WhatIsSkillScene },
-  { id: 'skill-file', Component: SkillFileScene },
-  { id: 'folder-structure', Component: FolderStructureScene },
-  { id: 'deep-prompts', Component: DeepPromptsScene },
-  { id: 'scripts', Component: ScriptsScene },
-  { id: 'brand', Component: BrandScene },
-  { id: 'activation', Component: ActivationScene },
-  { id: 'full-picture', Component: FullPictureScene },
-];
+const sceneComponents: Record<string, React.FC> = {
+  'hook': HookScene,
+  'what-is-skill': WhatIsSkillScene,
+  'skill-file': SkillFileScene,
+  'folder-structure': FolderStructureScene,
+  'deep-prompts': DeepPromptsScene,
+  'scripts': ScriptsScene,
+  'brand': BrandScene,
+  'activation': ActivationScene,
+  'full-picture': FullPictureScene,
+};
 
 const SceneCanvas: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AbsoluteFill>
@@ -37,12 +39,22 @@ const SceneCanvas: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </AbsoluteFill>
 );
 
+const allSections = withCTASections(script);
+
 export const SkillsExplainer: React.FC = () => (
   <AbsoluteFill style={{ backgroundColor: C.bg, fontFamily: 'Inter, sans-serif' }}>
-    {scenes.map(({ id, Component }) => {
-      const section = script.find(s => s.id === id)!;
+    {allSections.map(({ id, startFrame, durationInFrames, title }) => {
+      if (id === 'mid-cta' || id === 'end-cta') {
+        return (
+          <Sequence key={id} from={startFrame} durationInFrames={durationInFrames} name={title}>
+            <MavenCTAScene variant={id === 'mid-cta' ? 'mid' : 'end'} />
+          </Sequence>
+        );
+      }
+      const Component = sceneComponents[id];
+      if (!Component) return null;
       return (
-        <Sequence key={id} from={section.startFrame} durationInFrames={section.durationInFrames} name={section.title}>
+        <Sequence key={id} from={startFrame} durationInFrames={durationInFrames} name={title}>
           <SceneCanvas><Component /></SceneCanvas>
         </Sequence>
       );
