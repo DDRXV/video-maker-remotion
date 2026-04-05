@@ -20,7 +20,7 @@ const PipelineBlock: React.FC<{
 }> = ({ x, y, w, h, color, label, subLabel, enterAt }) => {
   const { frame, fps } = useScene('full-picture');
   const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [16, 0]);
+  const ty = interpolate(p, [0, 1], [16, 0], { extrapolateRight: 'clamp' });
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
       <rect x={x} y={y} width={w} height={h} rx={10} fill={C.cardFill} stroke={color} strokeWidth={2} />

@@ -34,7 +34,7 @@ const StepBox: React.FC<{
   enterAt: number; frame: number; fps: number;
 }> = ({ x, y, w, h, label, detail, detail2, accentColor = SLATE_MID, accentBg, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [10, 0]);
+  const ty = interpolate(p, [0, 1], [10, 0], { extrapolateRight: 'clamp' });
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
       <rect x={x} y={y} width={w} height={h} rx={8} fill={accentBg || C.white} stroke={accentColor} strokeWidth={1.2} strokeOpacity={0.4} />

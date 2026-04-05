@@ -45,7 +45,7 @@ const ResultCard: React.FC<{
   enterAt: number; frame: number; fps: number;
 }> = ({ x, y, w, rank, doc, highlighted, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [8, 0]);
+  const ty = interpolate(p, [0, 1], [8, 0], { extrapolateRight: 'clamp' });
   const border = highlighted ? RIGHT : SLATE_LIGHT;
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
@@ -183,7 +183,7 @@ export const RetrievalScene: React.FC = () => {
       <g style={{ opacity: pInsight }}>
         {(() => {
           const iy = listStartY + 5 * (cardH + cardGap) + 8;
-          const ty = interpolate(pInsight, [0, 1], [8, 0]);
+          const ty = interpolate(pInsight, [0, 1], [8, 0], { extrapolateRight: 'clamp' });
           return (
             <g style={{ transform: `translateY(${ty}px)` }}>
               <rect x={rightX} y={iy} width={colW} height={36} rx={8} fill={SLATE_BG} stroke={SLATE_LIGHT} strokeWidth={1} />

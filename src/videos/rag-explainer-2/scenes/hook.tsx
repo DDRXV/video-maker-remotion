@@ -29,8 +29,8 @@ export const HookScene: React.FC = () => {
   const totalPipeW = nodes.length * nodeW + (nodes.length - 1) * nodeGap;
   const pipeStartX = grid.center().x - totalPipeW / 2;
 
-  const pipelineOpacity = interpolate(pProblems, [0, 1], [1, 0.2]);
-  const allDimOpacity = interpolate(pModules, [0, 1], [1, 0.1]);
+  const pipelineOpacity = interpolate(pProblems, [0, 1], [1, 0.2], { extrapolateRight: 'clamp' });
+  const allDimOpacity = interpolate(pModules, [0, 1], [1, 0.1], { extrapolateRight: 'clamp' });
 
   // Problems
   const problems = [
@@ -65,7 +65,7 @@ export const HookScene: React.FC = () => {
           const nx = pipeStartX + i * (nodeW + nodeGap);
           const delay = beat('show-basic-flow') + i * 8;
           const np = entranceSpring(frame, fps, delay);
-          const ty = interpolate(np, [0, 1], [20, 0]);
+          const ty = interpolate(np, [0, 1], [20, 0], { extrapolateRight: 'clamp' });
           return (
             <g key={label} style={{ opacity: np, transform: `translateY(${ty}px)` }}>
               <rect x={nx} y={pipeY} width={nodeW} height={nodeH} rx={10} fill={C.cardFill} stroke={C.blue} strokeWidth={2} />
@@ -98,7 +98,7 @@ export const HookScene: React.FC = () => {
           const sx = grid.center().x - totalW / 2 + i * (cardW + gap);
           const delay = beat('show-problems') + i * 10;
           const cp = entranceSpring(frame, fps, delay);
-          const ty = interpolate(cp, [0, 1], [-30, 0]);
+          const ty = interpolate(cp, [0, 1], [-30, 0], { extrapolateRight: 'clamp' });
           return (
             <g key={p.label} style={{ opacity: cp, transform: `translateY(${ty}px)` }}>
               <rect x={sx} y={problemY} width={cardW} height={100} rx={12} fill={C.cardFill} stroke={C.error} strokeWidth={1.5} />
@@ -123,7 +123,7 @@ export const HookScene: React.FC = () => {
         {/* Underline */}
         {(() => {
           const lineW = 280;
-          const drawn = interpolate(pModules, [0, 1], [lineW, 0]);
+          const drawn = interpolate(pModules, [0, 1], [lineW, 0], { extrapolateRight: 'clamp' });
           return (
             <line
               x1={grid.center().x - lineW / 2} y1={grid.y(0.2) + 16}
@@ -152,7 +152,7 @@ export const HookScene: React.FC = () => {
           const py = grid.y(0.4) + row * (pillH + gapY);
           const delay = beat('show-six-modules') + 16 + Math.floor(i / 3) * 14 + (i % 3) * 3;
           const mp = entranceSpring(frame, fps, delay);
-          const slideX = interpolate(mp, [0, 1], [20, 0]);
+          const slideX = interpolate(mp, [0, 1], [20, 0], { extrapolateRight: 'clamp' });
 
           return (
             <g key={m.name} style={{ opacity: mp, transform: `translateX(${slideX}px)` }}>

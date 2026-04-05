@@ -58,7 +58,7 @@ export const OverviewScene: React.FC = () => {
       {blocks.map((b, i) => {
         const bx = startX + i * (blockW + gap);
         const np = progress(b.beatLabel);
-        const ty = interpolate(np, [0, 1], [20, 0]);
+        const ty = interpolate(np, [0, 1], [20, 0], { extrapolateRight: 'clamp' });
 
         const distFromLatest = latestVisibleIndex - i;
         const focusOpacity = np > 0.05
@@ -136,7 +136,7 @@ export const OverviewScene: React.FC = () => {
         const loopY = pipeY - 60;
         const lp = progress('show-generation');
         const pathLen = 600;
-        const offset = interpolate(lp, [0, 1], [pathLen, 0]);
+        const offset = interpolate(lp, [0, 1], [pathLen, 0], { extrapolateRight: 'clamp' });
 
         return (
           <g style={{ opacity: lp * 0.7 }}>

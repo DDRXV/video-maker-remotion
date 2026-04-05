@@ -175,7 +175,7 @@ export const QueryConstructionScene: React.FC = () => {
       {/* ── Question bubble ── */}
       <g style={{ opacity: pQuestion }}>
         {(() => {
-          const tx = interpolate(pQuestion, [0, 1], [-20, 0]);
+          const tx = interpolate(pQuestion, [0, 1], [-20, 0], { extrapolateRight: 'clamp' });
           return (
             <g style={{ transform: `translateX(${tx}px)` }}>
               <rect x={questionX} y={questionY} width={grid.x(0.42)} height={50} rx={10} fill={SLATE_BG} stroke={SLATE_LIGHT} strokeWidth={1.2} />
@@ -199,7 +199,7 @@ export const QueryConstructionScene: React.FC = () => {
         {(() => {
           const pw = grid.x(0.42);
           const ph = 110;
-          const ty = interpolate(pParser, [0, 1], [12, 0]);
+          const ty = interpolate(pParser, [0, 1], [12, 0], { extrapolateRight: 'clamp' });
           return (
             <g style={{ transform: `translateY(${ty}px)` }}>
               <rect x={parserX} y={parserY} width={pw} height={ph} rx={8} fill={C.white} stroke={SLATE_LIGHT} strokeWidth={1.2} />
@@ -266,7 +266,7 @@ export const QueryConstructionScene: React.FC = () => {
       {/* ── Result card ── */}
       <g style={{ opacity: pResult }}>
         {(() => {
-          const ty = interpolate(pResult, [0, 1], [10, 0]);
+          const ty = interpolate(pResult, [0, 1], [10, 0], { extrapolateRight: 'clamp' });
           const rw = grid.x(0.48);
           return (
             <g style={{ transform: `translateY(${ty}px)` }}>

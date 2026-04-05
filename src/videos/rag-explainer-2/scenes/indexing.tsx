@@ -72,7 +72,7 @@ const ScoreBadge: React.FC<{
   enterAt: number; frame: number; fps: number;
 }> = ({ x, y, score, label, color, bgColor, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [8, 0]);
+  const ty = interpolate(p, [0, 1], [8, 0], { extrapolateRight: 'clamp' });
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
       <rect x={x} y={y} width={180} height={54} rx={8} fill={bgColor} stroke={color} strokeWidth={1} strokeOpacity={0.3} />

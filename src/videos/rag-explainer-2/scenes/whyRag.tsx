@@ -67,7 +67,7 @@ const ConfidenceMeter: React.FC<{
 }> = ({ x, y, w, value, label, fillColor, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
   const barH = 12;
-  const fillW = interpolate(p, [0, 1], [0, w * value]);
+  const fillW = interpolate(p, [0, 1], [0, w * value], { extrapolateRight: 'clamp' });
   return (
     <g style={{ opacity: p }}>
       <text x={x} y={y - 4} fill={SLATE_MID} fontSize={11} fontWeight={500} fontFamily="monospace">{label}</text>
@@ -86,7 +86,7 @@ const DocPage: React.FC<{
   enterAt: number; frame: number; fps: number;
 }> = ({ x, y, w, h, title, lineCount, highlighted, highlightColor = SLATE_MID, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [8, 0]);
+  const ty = interpolate(p, [0, 1], [8, 0], { extrapolateRight: 'clamp' });
   const stroke = highlighted ? highlightColor : SLATE_LIGHT;
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
@@ -154,7 +154,7 @@ const DatabaseWithRows: React.FC<{
   const p = entranceSpring(frame, fps, enterAt);
   const dbW = 72;
   const dbH = 52;
-  const ty = interpolate(p, [0, 1], [8, 0]);
+  const ty = interpolate(p, [0, 1], [8, 0], { extrapolateRight: 'clamp' });
   const stroke = highlighted ? RIGHT : SLATE_LIGHT;
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>

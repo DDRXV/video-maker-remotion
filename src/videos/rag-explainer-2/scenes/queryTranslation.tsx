@@ -28,7 +28,7 @@ const DocPage: React.FC<{
   enterAt: number; frame: number; fps: number;
 }> = ({ x, y, w, h, title, lines, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [8, 0]);
+  const ty = interpolate(p, [0, 1], [8, 0], { extrapolateRight: 'clamp' });
   return (
     <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
       <rect x={x + 1} y={y + 1} width={w} height={h} rx={4} fill={SLATE} fillOpacity={0.03} />
@@ -50,7 +50,7 @@ const QueryVersion: React.FC<{
   enterAt: number; frame: number; fps: number;
 }> = ({ x, y, w, num, text, enterAt, frame, fps }) => {
   const p = entranceSpring(frame, fps, enterAt);
-  const tx = interpolate(p, [0, 1], [20, 0]);
+  const tx = interpolate(p, [0, 1], [20, 0], { extrapolateRight: 'clamp' });
   return (
     <g style={{ opacity: p, transform: `translateX(${tx}px)` }}>
       <rect x={x} y={y} width={w} height={50} rx={8} fill={C.white} stroke={SLATE_LIGHT} strokeWidth={1.2} />
@@ -190,7 +190,7 @@ export const QueryTranslationScene: React.FC = () => {
         {(() => {
           const cy = versionY(2) + 86;
           const cw = grid.x(0.92);
-          const ty = interpolate(pCombined, [0, 1], [10, 0]);
+          const ty = interpolate(pCombined, [0, 1], [10, 0], { extrapolateRight: 'clamp' });
           return (
             <g style={{ transform: `translateY(${ty}px)` }}>
               <rect x={grid.x(0.04)} y={cy} width={cw} height={50} rx={8} fill={C.white} stroke={SLATE_LIGHT} strokeWidth={1.2} />
