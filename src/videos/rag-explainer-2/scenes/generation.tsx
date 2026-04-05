@@ -153,16 +153,24 @@ export const GenerationScene: React.FC = () => {
           enterAt={beat('show-fail')} frame={frame} fps={fps} />
       </g>
 
-      {/* Loop-back arrow from eval to re-retrieve */}
-      {pReRetrieve > 0.05 && (
-        <g style={{ opacity: pReRetrieve * 0.5 }}>
-          <path
-            d={`M ${s2X + evalW / 2} ${row1Y + boxH + 42} C ${s2X + evalW / 2} ${row1Y + boxH + 80}, ${s1X + stepW / 2} ${row2Y - 40}, ${s1X + stepW / 2} ${row2Y - 8}`}
-            fill="none" stroke={MOD} strokeWidth={1.5} strokeDasharray="6 4" strokeLinecap="round" />
-          <polygon points={`${s1X + stepW / 2},${row2Y - 4} ${s1X + stepW / 2 - 5},${row2Y - 12} ${s1X + stepW / 2 + 5},${row2Y - 12}`} fill={MOD} fillOpacity={0.5} />
-          <text x={(s2X + evalW / 2 + s1X + stepW / 2) / 2} y={row2Y - 30} textAnchor="middle" fill={MOD} fontSize={11} fontWeight={500} fontFamily="monospace">re-retrieve</text>
-        </g>
-      )}
+      {/* Loop-back arrow from eval to re-retrieve — L-shaped box path */}
+      {pReRetrieve > 0.05 && (() => {
+        const fromX = s2X + evalW / 2;
+        const fromY = row1Y + boxH + 42;
+        const toX = s1X + stepW / 2;
+        const toY = row2Y - 8;
+        const midY = (fromY + toY) / 2;
+        const r = 12;
+        const d = `M ${fromX} ${fromY} L ${fromX} ${midY - r} Q ${fromX} ${midY} ${fromX - r} ${midY} L ${toX + r} ${midY} Q ${toX} ${midY} ${toX} ${midY + r} L ${toX} ${toY}`;
+        return (
+          <g style={{ opacity: pReRetrieve * 0.5 }}>
+            <path d={d} fill="none" stroke={MOD} strokeWidth={1.5} strokeDasharray="6 4" strokeLinecap="round" />
+            <polygon points={`${toX},${toY + 2} ${toX - 5},${toY - 7} ${toX + 5},${toY - 7}`} fill={MOD} fillOpacity={0.5} />
+            <rect x={(fromX + toX) / 2 - 40} y={midY - 11} width={80} height={20} rx={4} fill={C.white} />
+            <text x={(fromX + toX) / 2} y={midY + 1} textAnchor="middle" dominantBaseline="central" fill={MOD} fontSize={11} fontWeight={500} fontFamily="monospace">re-retrieve</text>
+          </g>
+        );
+      })()}
 
       {/* ── ROW 2: Attempt 2 (passes) ── */}
       <text x={s1X} y={row2Y - 10} fill={SLATE_MID} fontSize={11} fontWeight={600} style={{ opacity: pAttempt2 }}>ATTEMPT 2</text>

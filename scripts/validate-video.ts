@@ -188,7 +188,17 @@ function validateVideoDir(dirName: string) {
       addIssue(scenePath, 'warn', 'FlowArrow used in pipeline scene — FlowArrow adds curves. Use straight <line> + <polygon> arrowhead for pipeline connections.');
     }
 
-    // 2i. Image preserveAspectRatio — flag "slice" which crops
+    // 2i. Curved feedback loops — should use L-shaped box paths not bezier curves
+    lines.forEach((line, i) => {
+      // Flag cubic bezier curves (C command) in dashed paths used as feedback/loop arrows
+      if (line.includes(' C ') && (content.includes('loop') || content.includes('feedback') || content.includes('re-retrieve') || content.includes('self-correction'))) {
+        if (line.includes('strokeDasharray') || lines.slice(Math.max(0, i - 3), i + 3).some(l => l.includes('strokeDasharray'))) {
+          addIssue(scenePath, 'warn', `Curved bezier path (C command) used for feedback loop on line ${i + 1}. Use L-shaped box path with Q corners instead.`, i + 1);
+        }
+      }
+    });
+
+    // 2i2. Image preserveAspectRatio — flag "slice" which crops
     lines.forEach((line, i) => {
       if (line.includes('preserveAspectRatio') && line.includes('slice')) {
         addIssue(scenePath, 'warn', `preserveAspectRatio="slice" on line ${i + 1} crops image edges. Use "xMinYMin meet" to show full image.`, i + 1);

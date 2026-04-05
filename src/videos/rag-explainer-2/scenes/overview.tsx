@@ -124,39 +124,24 @@ export const OverviewScene: React.FC = () => {
         });
       })()}
 
-      {/* Feedback loop: dashed curved path from Generation back to Translation */}
+      {/* Feedback loop: L-shaped box path from Generation back to Translation */}
       {(() => {
         const genIndex = 5;
         const transIndex = 2;
         const genX = startX + genIndex * (blockW + gap) + blockW / 2;
         const transX = startX + transIndex * (blockW + gap) + blockW / 2;
-        const loopY = pipeY - 60;
+        const loopTop = pipeY - 10;
+        const loopTopY = pipeY - 50;
+        const r = 14;
         const lp = progress('show-generation');
-        const pathLen = 600;
-        const offset = interpolate(lp, [0, 1], [pathLen, 0], { extrapolateRight: 'clamp' });
+        const d = `M ${genX} ${loopTop} L ${genX} ${loopTopY + r} Q ${genX} ${loopTopY} ${genX - r} ${loopTopY} L ${transX + r} ${loopTopY} Q ${transX} ${loopTopY} ${transX} ${loopTopY + r} L ${transX} ${loopTop}`;
 
         return (
-          <g style={{ opacity: lp * 0.7 }}>
-            <path
-              d={`M ${genX} ${pipeY} C ${genX} ${loopY}, ${transX} ${loopY}, ${transX} ${pipeY}`}
-              fill="none" stroke={C.generation} strokeWidth={2}
-              strokeDasharray="8 5" strokeDashoffset={offset} strokeLinecap="round"
-            />
-            <polygon
-              points={`${transX},${pipeY} ${transX - 6},${pipeY - 12} ${transX + 6},${pipeY - 12}`}
-              fill={C.generation} style={{ opacity: lp }}
-            />
-            {/* Label */}
-            {(() => {
-              const labelX = (genX + transX) / 2;
-              const labelW = 200;
-              return (
-                <g>
-                  <rect x={labelX - labelW / 2} y={loopY - 18} width={labelW} height={30} rx={15} fill={C.generation} fillOpacity={0.08} stroke={C.generation} strokeWidth={1} />
-                  <text x={labelX} y={loopY - 2} textAnchor="middle" dominantBaseline="central" fill={C.generation} fontSize={FONT_SIZE.xs} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>re-retrieve if needed</text>
-                </g>
-              );
-            })()}
+          <g style={{ opacity: lp * 0.5 }}>
+            <path d={d} fill="none" stroke={C.generation} strokeWidth={1.5} strokeDasharray="6 4" strokeLinecap="round" />
+            <polygon points={`${transX},${loopTop + 2} ${transX - 5},${loopTop - 7} ${transX + 5},${loopTop - 7}`} fill={C.generation} fillOpacity={0.6} />
+            <rect x={(genX + transX) / 2 - 80} y={loopTopY - 12} width={160} height={22} rx={4} fill={C.bg} />
+            <text x={(genX + transX) / 2} y={loopTopY} textAnchor="middle" dominantBaseline="central" fill={C.generation} fontSize={12} fontFamily="monospace" fillOpacity={0.7}>re-retrieve if needed</text>
           </g>
         );
       })()}
