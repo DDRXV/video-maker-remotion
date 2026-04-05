@@ -5,7 +5,6 @@ import { grid } from '../../../utils/layout';
 import { FONT_SIZE, TYPOGRAPHY } from '../../../design-system/tokens';
 import { entranceSpring } from '../../../design-system/easing';
 import { FlowArrow } from '../../../components/FlowArrow';
-import { DashFlow } from '../../../components/DashFlow';
 import { TextBox } from '../../../components/TextBox';
 
 /**
@@ -30,9 +29,9 @@ const blocks: BlockDef[] = [
 export const OverviewScene: React.FC = () => {
   const { beat, progress, frame, fps } = useScene('overview');
 
-  const blockW = 170;
+  const blockW = 160;
   const blockH = 64;
-  const gap = 16;
+  const gap = 28;
   const totalW = blocks.length * blockW + (blocks.length - 1) * gap;
   const startX = grid.center().x - totalW / 2;
   const pipeY = grid.y(0.34);
@@ -163,15 +162,6 @@ export const OverviewScene: React.FC = () => {
           </g>
         );
       })()}
-
-      {/* DashFlow along bottom after highlight */}
-      {pHighlight > 0.1 && (
-        <DashFlow
-          from={{ x: startX, y: pipeY + blockH + 16 }}
-          to={{ x: startX + totalW, y: pipeY + blockH + 16 }}
-          enterAt={beat('highlight-six')} color={C.blue} speed={90} strokeWidth={1.2}
-        />
-      )}
 
       {/* Bottom text */}
       <TextBox

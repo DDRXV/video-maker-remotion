@@ -329,6 +329,19 @@ Don't label a transformation — SHOW it. Examples:
 - Use `strokeLinecap="round"` on all lines.
 - Add traveling dots on primary flow arrows.
 
+**Arrow-to-block gap (critical):**
+- Minimum 28-32px gap between pipeline blocks. Arrows need room to breathe.
+- Arrow start: `blockRightEdge + 6`. Arrow end: `nextBlockLeftEdge - 6`. This prevents arrows overlapping block borders.
+- Use simple `<line>` + `<polygon>` arrowhead for horizontal connections. Don't use FlowArrow or DashFlow components for pipeline connections — they add curves and overlapping lines.
+- Self-correction loops: use clean L-shaped `<path>` with `Q` curves for corners (radius 12-14px). Push loop bottom at least 40px below block bottom edge.
+
+**Never use DashFlow across a pipeline.** DashFlow draws a continuous dashed line from start to end — it passes straight through blocks in between. For pipeline flow animation, use staggered block entrances instead.
+
+**SVG image preserveAspectRatio:**
+- Use `preserveAspectRatio="xMinYMin meet"` to show full image without cropping.
+- Never use `"xMidYMid slice"` for screenshots or reference images — it crops edges.
+- Size the container to match the image's aspect ratio so no letterboxing occurs.
+
 ### Anti-AI-Slop Rules
 - **No gradient fills.** Flat fills with opacity variation only.
 - **No neon/electric blues** (#0066FF, #0099FF) as primary.

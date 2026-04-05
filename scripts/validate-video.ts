@@ -178,7 +178,32 @@ function validateVideoDir(dirName: string) {
       addIssue(scenePath, 'warn', `High element count (${totalElements} rects+text+circles). Consider splitting into sub-views.`);
     }
 
-    // 2h. Canvas boundary — check for hardcoded coordinates past margins
+    // 2h. DashFlow across pipelines — banned pattern
+    if (content.includes('DashFlow') && content.includes('Pipeline') || content.includes('fullPicture') || content.includes('full-picture')) {
+      if (content.includes('<DashFlow')) {
+        addIssue(scenePath, 'warn', 'DashFlow used in pipeline scene — DashFlow draws a continuous line through blocks. Use staggered entrances instead.');
+      }
+    }
+
+    // 2i. Image preserveAspectRatio — flag "slice" which crops
+    lines.forEach((line, i) => {
+      if (line.includes('preserveAspectRatio') && line.includes('slice')) {
+        addIssue(scenePath, 'warn', `preserveAspectRatio="slice" on line ${i + 1} crops image edges. Use "xMinYMin meet" to show full image.`, i + 1);
+      }
+    });
+
+    // 2j. Pipeline gap check — flag small gaps between blocks
+    lines.forEach((line, i) => {
+      const gapMatch = line.match(/\bgap\s*=\s*(\d+)/);
+      if (gapMatch) {
+        const gapVal = parseInt(gapMatch[1]);
+        if (gapVal < 24 && (content.includes('pipeline') || content.includes('Pipeline') || content.includes('blockW') || content.includes('blockCount'))) {
+          addIssue(scenePath, 'warn', `Pipeline gap=${gapVal}px on line ${i + 1} — minimum 28px to prevent arrow overlap with blocks.`, i + 1);
+        }
+      }
+    });
+
+    // 2k. Canvas boundary — check for hardcoded coordinates past margins
     lines.forEach((line, i) => {
       // Check for x coordinates > 1840 (CANVAS.width - margin)
       const xMatch = line.match(/\bx[=:{]\s*\{?\s*(\d{4,})\s*\}?/);
