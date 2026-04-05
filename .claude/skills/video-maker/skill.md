@@ -58,6 +58,17 @@ Build each scene with custom inline SVG illustrations specific to the video's co
 ### Step 5: Wire Composition
 Create the composition file that imports all scenes, maps them to `<Sequence>` blocks driven by script.ts timing, and wraps each in `SceneCanvas`.
 
+### Step 5.5: Run Pre-Render Validation
+**Mandatory before rendering or previewing.**
+
+```bash
+npm run validate <video-directory-name>
+```
+
+This catches structural issues without expensive rendering: font sizes, missing clamp, FlowArrow in pipelines, DashFlow usage, curved feedback loops, pipeline gap < 28px, image slice crops, canvas boundary overflow, and more.
+
+**All checks must pass before proceeding to Step 6.**
+
 ### Step 6: Visual QA — Screenshot Every Beat
 **Mandatory before showing the user.** Render still frames at EVERY beat of EVERY scene and review them.
 
@@ -403,7 +414,19 @@ These come from real QA failures. They apply regardless of visual style.
 
 15. **Left accent stripes > colored header fills on cards.** A 4-6px rounded stripe on the left edge is architectural. Full-width colored header band is PowerPoint.
 
-## 8. File Structure
+## 8. Bug Fix Workflow (Mandatory)
+
+When a visual bug is reported or discovered:
+
+1. **Update the validator FIRST** — add a check to `scripts/validate-video.ts` that catches the specific pattern
+2. **Run the validator** — confirm it flags the exact file and line with the issue
+3. **Fix the code** — now fix the actual scene files
+4. **Re-run the validator** — confirm all checks pass
+5. **Update the skill file** — add the rule so it's followed during first generation
+
+**Never fix code without first ensuring the validator would catch the same issue in the future.** The goal is that every bug found manually gets encoded into the validator so it can never happen again.
+
+## 9. File Structure
 
 ```
 src/videos/{video-name}/
