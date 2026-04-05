@@ -4,7 +4,6 @@ import { useScene, C } from '../styles';
 import { grid } from '../../../utils/layout';
 import { FONT_SIZE, TYPOGRAPHY } from '../../../design-system/tokens';
 import { entranceSpring } from '../../../design-system/easing';
-import { FlowArrow } from '../../../components/FlowArrow';
 import { TextBox } from '../../../components/TextBox';
 
 /**
@@ -73,18 +72,18 @@ export const HookScene: React.FC = () => {
             </g>
           );
         })}
-        {/* Arrows */}
+        {/* Straight arrows */}
         {nodes.slice(0, -1).map((_, i) => {
-          const fromX = pipeStartX + i * (nodeW + nodeGap) + nodeW;
-          const toX = pipeStartX + (i + 1) * (nodeW + nodeGap);
+          const fromX = pipeStartX + i * (nodeW + nodeGap) + nodeW + 6;
+          const toX = pipeStartX + (i + 1) * (nodeW + nodeGap) - 6;
+          const arrowY = pipeY + nodeH / 2;
+          const delay = beat('show-basic-flow') + (i + 1) * 8;
+          const ap = entranceSpring(frame, fps, delay);
           return (
-            <FlowArrow
-              key={i}
-              from={{ x: fromX + 4, y: pipeY + nodeH / 2 }}
-              to={{ x: toX - 4, y: pipeY + nodeH / 2 }}
-              enterAt={beat('show-basic-flow') + (i + 1) * 8}
-              color={C.blue} strokeWidth={2}
-            />
+            <g key={i} style={{ opacity: ap * 0.7 }}>
+              <line x1={fromX} y1={arrowY} x2={toX - 8} y2={arrowY} stroke={C.blue} strokeWidth={2} strokeLinecap="round" />
+              <polygon points={`${toX},${arrowY} ${toX - 8},${arrowY - 4.5} ${toX - 8},${arrowY + 4.5}`} fill={C.blue} />
+            </g>
           );
         })}
       </g>

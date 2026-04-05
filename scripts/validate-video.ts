@@ -178,11 +178,14 @@ function validateVideoDir(dirName: string) {
       addIssue(scenePath, 'warn', `High element count (${totalElements} rects+text+circles). Consider splitting into sub-views.`);
     }
 
-    // 2h. DashFlow across pipelines — banned pattern
-    if (content.includes('DashFlow') && content.includes('Pipeline') || content.includes('fullPicture') || content.includes('full-picture')) {
-      if (content.includes('<DashFlow')) {
-        addIssue(scenePath, 'warn', 'DashFlow used in pipeline scene — DashFlow draws a continuous line through blocks. Use staggered entrances instead.');
-      }
+    // 2h. DashFlow — banned in any scene with pipeline blocks
+    if (content.includes('<DashFlow')) {
+      addIssue(scenePath, 'warn', 'DashFlow draws a continuous line through blocks. Remove it. Use staggered block entrances instead.');
+    }
+
+    // 2h2. FlowArrow in pipeline scenes — should use straight <line> + <polygon> instead
+    if ((content.includes('blockW') || content.includes('blockCount') || content.includes('pipeline') || content.includes('Pipeline')) && content.includes('<FlowArrow')) {
+      addIssue(scenePath, 'warn', 'FlowArrow used in pipeline scene — FlowArrow adds curves. Use straight <line> + <polygon> arrowhead for pipeline connections.');
     }
 
     // 2i. Image preserveAspectRatio — flag "slice" which crops

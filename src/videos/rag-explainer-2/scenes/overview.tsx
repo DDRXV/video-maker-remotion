@@ -4,7 +4,6 @@ import { useScene, C } from '../styles';
 import { grid } from '../../../utils/layout';
 import { FONT_SIZE, TYPOGRAPHY } from '../../../design-system/tokens';
 import { entranceSpring } from '../../../design-system/easing';
-import { FlowArrow } from '../../../components/FlowArrow';
 import { TextBox } from '../../../components/TextBox';
 
 /**
@@ -78,18 +77,17 @@ export const OverviewScene: React.FC = () => {
         );
       })}
 
-      {/* Connection arrows */}
+      {/* Straight horizontal arrows between blocks */}
       {blocks.slice(0, -1).map((_, i) => {
-        const fromX = startX + i * (blockW + gap) + blockW;
-        const toX = startX + (i + 1) * (blockW + gap);
+        const fromX = startX + i * (blockW + gap) + blockW + 6;
+        const toX = startX + (i + 1) * (blockW + gap) - 6;
+        const arrowY = pipeY + blockH / 2;
+        const ap = progress(blocks[i + 1].beatLabel);
         return (
-          <FlowArrow
-            key={`arrow-${i}`}
-            from={{ x: fromX + 2, y: pipeY + blockH / 2 }}
-            to={{ x: toX - 2, y: pipeY + blockH / 2 }}
-            enterAt={beat(blocks[i + 1].beatLabel)}
-            color={C.cardStroke} strokeWidth={1.5}
-          />
+          <g key={`arrow-${i}`} style={{ opacity: ap * 0.7 }}>
+            <line x1={fromX} y1={arrowY} x2={toX - 8} y2={arrowY} stroke={C.cardStroke} strokeWidth={1.5} strokeLinecap="round" />
+            <polygon points={`${toX},${arrowY} ${toX - 7},${arrowY - 4} ${toX - 7},${arrowY + 4}`} fill={C.cardStroke} />
+          </g>
         );
       })}
 
