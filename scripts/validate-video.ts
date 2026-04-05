@@ -123,6 +123,74 @@ function validateVideoDir(dirName: string) {
     if (content.includes('<Sequence') && !content.includes('premountFor')) {
       addIssue(scenePath, 'warn', 'Sequence without premountFor={30} — may cause blank frame flash');
     }
+
+    // 2d. Text overflow detection — estimate monospace text vs container width
+    lines.forEach((line, i) => {
+      // Look for monospace text inside containers: text + fontFamily="monospace" near a width
+      if (line.includes('fontFamily="monospace"') || line.includes("fontFamily={'monospace'}") || line.includes('fontFamily="mono"')) {
+        const textMatch = line.match(/>\{?['"`]([^'"}`]+)['"`]\}?</);
+        const sizeMatch = line.match(/fontSize[=:{]\s*(\d+)/);
+        if (textMatch && sizeMatch) {
+          const text = textMatch[1];
+          const fontSize = parseInt(sizeMatch[1]);
+          const estimatedWidth = text.length * fontSize * 0.6;
+          if (estimatedWidth > 400) {
+            addIssue(scenePath, 'warn', `Monospace text "${text.slice(0, 30)}..." (~${Math.round(estimatedWidth)}px) may overflow container on line ${i + 1}`, i + 1);
+          }
+        }
+      }
+    });
+
+    // 2e. Diagonal arrow detection — only on Arrow/FlowLine/FlowArrow components
+    lines.forEach((line, i) => {
+      // Only check lines that invoke Arrow, FlowLine, or FlowArrow components
+      if (/<(Arrow|FlowLine|FlowArrow)\s/.test(line) || /<(Arrow|FlowLine|FlowArrow)\s/.test(lines[i - 1] || '')) {
+        const arrowMatch = line.match(/y1[=:{]\s*\{?([^}>,]+)\}?\s.*y2[=:{]\s*\{?([^}>,]+)\}?/);
+        if (arrowMatch) {
+          const y1 = arrowMatch[1].trim();
+          const y2 = arrowMatch[2].trim();
+          if (y1 !== y2 && !line.includes('curved') && !line.includes('// diagonal-ok')) {
+            addIssue(scenePath, 'warn', `Diagonal arrow: y1=${y1} vs y2=${y2} on line ${i + 1}. Use same Y for horizontal.`, i + 1);
+          }
+        }
+      }
+    });
+
+    // 2f. Generic circle detection — flag circles that look like placeholders
+    lines.forEach((line, i) => {
+      if (line.includes('<circle') && (line.includes('label') || line.includes('icon'))) {
+        const nextLine = lines[i + 1] || '';
+        // If circle has a text label right after it (placeholder pattern), flag
+        if (nextLine.includes('<text') && nextLine.includes('textAnchor="middle"')) {
+          addIssue(scenePath, 'warn', `Possible generic circle placeholder on line ${i + 1}. Use purpose-built shapes.`, i + 1);
+        }
+      }
+    });
+
+    // 2g. Element density — count distinct visual elements
+    const rectCount = (content.match(/<rect\s/g) || []).length;
+    const textCount = (content.match(/<text\s/g) || []).length;
+    const circleCount = (content.match(/<circle\s/g) || []).length;
+    const totalElements = rectCount + textCount + circleCount;
+    // Check if scene uses sub-views (View1, View2 pattern) — higher density is OK
+    const hasSubViews = content.includes('opacity={v1Op}') || content.includes('View1') || content.includes('view1');
+    if (totalElements > 80 && !hasSubViews) {
+      addIssue(scenePath, 'warn', `High element count (${totalElements} rects+text+circles). Consider splitting into sub-views.`);
+    }
+
+    // 2h. Canvas boundary — check for hardcoded coordinates past margins
+    lines.forEach((line, i) => {
+      // Check for x coordinates > 1840 (CANVAS.width - margin)
+      const xMatch = line.match(/\bx[=:{]\s*\{?\s*(\d{4,})\s*\}?/);
+      if (xMatch && parseInt(xMatch[1]) > 1840) {
+        addIssue(scenePath, 'warn', `x=${xMatch[1]} exceeds right margin (1840) on line ${i + 1}`, i + 1);
+      }
+      // Check for y coordinates > 980 (CANVAS.height - 100 for summary)
+      const yMatch = line.match(/\by[=:{]\s*\{?\s*(\d{3,})\s*\}?/);
+      if (yMatch && parseInt(yMatch[1]) > 980) {
+        addIssue(scenePath, 'warn', `y=${yMatch[1]} exceeds bottom safe area (980) on line ${i + 1}`, i + 1);
+      }
+    });
   }
 
   // 3. Check composition file exists

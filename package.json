@@ -6,8 +6,7 @@
     "preview": "remotion preview src/index.ts",
     "render": "remotion render src/index.ts RAGExplainer out/rag-explainer.mp4",
     "new-video": "tsx scripts/new-video.ts",
-    "validate": "tsx scripts/validate-video.ts",
-    "visual-qa": "tsx scripts/visual-qa.ts"
+    "validate": "tsx scripts/validate-video.ts"
   },
   "keywords": [],
   "author": "",
