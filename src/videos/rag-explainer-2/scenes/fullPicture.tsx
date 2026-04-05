@@ -4,50 +4,20 @@ import { useScene, C } from '../styles';
 import { grid } from '../../../utils/layout';
 import { FONT_SIZE, TYPOGRAPHY } from '../../../design-system/tokens';
 import { entranceSpring } from '../../../design-system/easing';
-import { DashFlow } from '../../../components/DashFlow';
-import { FlowArrow } from '../../../components/FlowArrow';
+import { FloatingParticles } from '../../../scene-templates';
 import { TextBox } from '../../../components/TextBox';
 
 /**
- * ByteByteGo-style full pipeline + incremental adoption steps.
- * Clean numbered blocks, self-correction loop, step-by-step adoption card.
+ * The Complete System — full pipeline + incremental adoption.
+ *
+ * Clean box arrows, no DashFlow, no overlapping lines.
+ * Premium: floating particles, glow halos on blocks, staggered entrance.
  */
 
-const PipelineBlock: React.FC<{
-  x: number; y: number; w: number; h: number;
-  color: string; label: string; subLabel?: string;
-  enterAt: number;
-}> = ({ x, y, w, h, color, label, subLabel, enterAt }) => {
-  const { frame, fps } = useScene('full-picture');
-  const p = entranceSpring(frame, fps, enterAt);
-  const ty = interpolate(p, [0, 1], [16, 0], { extrapolateRight: 'clamp' });
-  return (
-    <g style={{ opacity: p, transform: `translateY(${ty}px)` }}>
-      <rect x={x} y={y} width={w} height={h} rx={10} fill={C.cardFill} stroke={color} strokeWidth={2} />
-      <rect x={x} y={y} width={5} height={h} rx={2.5} fill={color} fillOpacity={0.7} />
-      <text x={x + w / 2} y={y + h / 2 - (subLabel ? 6 : 0)} textAnchor="middle" dominantBaseline="central" fill={color} fontSize={FONT_SIZE.sm} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>{label}</text>
-      {subLabel && (
-        <text x={x + w / 2} y={y + h / 2 + 14} textAnchor="middle" dominantBaseline="central" fill={color} fontSize={12} fontWeight={400} fontFamily="monospace" fillOpacity={0.7}>{subLabel}</text>
-      )}
-    </g>
-  );
-};
-
-const StepRow: React.FC<{
-  x: number; y: number; num: number; text: string; when: string;
-  enterAt: number; maxW: number;
-}> = ({ x, y, num, text, when, enterAt, maxW }) => {
-  const { frame, fps } = useScene('full-picture');
-  const p = entranceSpring(frame, fps, enterAt);
-  return (
-    <g style={{ opacity: p }}>
-      <circle cx={x + 12} cy={y + 10} r={12} fill={C.blue} fillOpacity={0.08} stroke={C.blue} strokeWidth={1} />
-      <text x={x + 12} y={y + 11} textAnchor="middle" dominantBaseline="central" fill={C.blue} fontSize={FONT_SIZE.xs} fontWeight={700} fontFamily={TYPOGRAPHY.label.fontFamily}>{num}</text>
-      <text x={x + 32} y={y + 11} dominantBaseline="central" fill={C.dark} fontSize={FONT_SIZE.md} fontWeight={500} fontFamily={TYPOGRAPHY.label.fontFamily}>{text}</text>
-      <text x={x + maxW} y={y + 11} textAnchor="end" dominantBaseline="central" fill={C.mid} fontSize={FONT_SIZE.xs} fontFamily="monospace">{when}</text>
-    </g>
-  );
-};
+const SLATE = '#334155';
+const SLATE_MID = '#64748b';
+const SLATE_LIGHT = '#cbd5e1';
+const SLATE_BG = '#f1f5f9';
 
 export const FullPictureScene: React.FC = () => {
   const { beat, progress, frame, fps } = useScene('full-picture');
@@ -57,13 +27,16 @@ export const FullPictureScene: React.FC = () => {
   const incP = progress('show-incremental');
   const finalP = progress('final-frame');
 
-  const pipeY = grid.y(0.14);
-  const pipeH = 64;
-  const totalW = grid.x(0.84);
-  const startX = grid.x(0.08);
+  // Layout
+  const pipeY = grid.y(0.16);
+  const pipeH = 68;
+  const startX = grid.x(0.1);
+  const endX = grid.x(0.9);
   const blockCount = 6;
-  const gap = 28;
+  const gap = 32;
+  const totalW = endX - startX;
   const blockW = (totalW - gap * (blockCount - 1)) / blockCount;
+  const ay = pipeY + pipeH / 2; // arrow Y — constant for all horizontal arrows
 
   const modules = [
     { label: 'Routing', color: C.routing },
@@ -75,7 +48,7 @@ export const FullPictureScene: React.FC = () => {
   ];
 
   const incX = grid.x(0.06);
-  const incStartY = grid.y(0.46);
+  const incStartY = grid.y(0.5);
   const incRowH = 38;
   const incMaxW = grid.x(0.88);
 
@@ -87,111 +60,153 @@ export const FullPictureScene: React.FC = () => {
     { text: 'Add generation feedback', when: 'When trust matters' },
   ];
 
-  const dashY = pipeY + pipeH + 16;
+  // Block positions helper
+  const blockX = (i: number) => startX + i * (blockW + gap);
+  const blockRight = (i: number) => blockX(i) + blockW;
+  const blockCenterX = (i: number) => blockX(i) + blockW / 2;
 
   return (
     <g>
+      <FloatingParticles color={C.blue} baseOpacity={0.06} />
+
       {/* Title */}
       <g style={{ opacity: diagP }}>
-        <text x={grid.center().x} y={grid.y(0.03)} textAnchor="middle" fill={C.dark} fontSize={FONT_SIZE['2xl']} fontWeight={700} fontFamily={TYPOGRAPHY.heading.fontFamily}>The Complete System</text>
+        <text x={grid.center().x} y={grid.y(0.04)} textAnchor="middle" fill={SLATE}
+          fontSize={FONT_SIZE['2xl']} fontWeight={700} fontFamily={TYPOGRAPHY.heading.fontFamily}>
+          The Complete System
+        </text>
+        {/* Underline */}
+        {(() => {
+          const lw = 240;
+          const drawn = interpolate(diagP, [0, 1], [lw, 0], { extrapolateRight: 'clamp' });
+          return <line x1={grid.center().x - lw / 2} y1={grid.y(0.04) + 14} x2={grid.center().x + lw / 2} y2={grid.y(0.04) + 14}
+            stroke={C.blue} strokeWidth={2.5} strokeLinecap="round" strokeDasharray={lw} strokeDashoffset={drawn} />;
+        })()}
       </g>
 
-      {/* Question label + arrow */}
+      {/* ── Question label ── */}
       <g style={{ opacity: diagP }}>
-        <text x={startX - 28} y={pipeY + pipeH / 2 + 1} textAnchor="end" dominantBaseline="central" fill={C.blue} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>Question</text>
-        <line x1={startX - 24} y1={pipeY + pipeH / 2} x2={startX - 8} y2={pipeY + pipeH / 2} stroke={C.blue} strokeWidth={1.5} strokeLinecap="round" />
-        <polygon points={`${startX - 2},${pipeY + pipeH / 2} ${startX - 9},${pipeY + pipeH / 2 - 4} ${startX - 9},${pipeY + pipeH / 2 + 4}`} fill={C.blue} />
+        <text x={startX - 30} y={ay + 1} textAnchor="end" dominantBaseline="central"
+          fill={C.blue} fontSize={FONT_SIZE.lg} fontWeight={700} fontFamily={TYPOGRAPHY.label.fontFamily}>Question</text>
+        <line x1={startX - 26} y1={ay} x2={startX - 10} y2={ay} stroke={C.blue} strokeWidth={2} strokeLinecap="round" />
+        <polygon points={`${startX - 4},${ay} ${startX - 11},${ay - 4.5} ${startX - 11},${ay + 4.5}`} fill={C.blue} />
       </g>
 
-      {/* Pipeline blocks */}
+      {/* ── Pipeline blocks with staggered entrance ── */}
       {modules.map((mod, i) => {
-        const bx = startX + i * (blockW + gap);
+        const bx = blockX(i);
+        const delay = beat('show-full-diagram') + i * 4;
+        const p = entranceSpring(frame, fps, delay);
+        const ty = interpolate(p, [0, 1], [14, 0], { extrapolateRight: 'clamp' });
         return (
-          <PipelineBlock
-            key={i} x={bx} y={pipeY} w={blockW} h={pipeH}
-            color={mod.color} label={mod.label} subLabel={mod.subLabel}
-            enterAt={beat('show-full-diagram')}
-          />
+          <g key={i} style={{ opacity: p, transform: `translateY(${ty}px)` }}>
+            {/* Glow halo */}
+            <rect x={bx - 4} y={pipeY - 4} width={blockW + 8} height={pipeH + 8} rx={14} fill={mod.color} fillOpacity={0.03} />
+            {/* Block */}
+            <rect x={bx} y={pipeY} width={blockW} height={pipeH} rx={10} fill={C.white} stroke={mod.color} strokeWidth={2} />
+            {/* Left accent stripe */}
+            <rect x={bx} y={pipeY} width={5} height={pipeH} rx={2.5} fill={mod.color} fillOpacity={0.7} />
+            {/* Label */}
+            <text x={bx + blockW / 2} y={ay - (mod.subLabel ? 7 : 0)} textAnchor="middle" dominantBaseline="central"
+              fill={mod.color} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>{mod.label}</text>
+            {mod.subLabel && (
+              <text x={bx + blockW / 2} y={ay + 14} textAnchor="middle" dominantBaseline="central"
+                fill={mod.color} fontSize={13} fontWeight={400} fontFamily="monospace" fillOpacity={0.7}>{mod.subLabel}</text>
+            )}
+          </g>
         );
       })}
 
-      {/* Answer label + arrow */}
+      {/* ── Straight horizontal arrows between blocks ── */}
+      {modules.slice(0, -1).map((_, i) => {
+        const fromX = blockRight(i) + 6;
+        const toX = blockX(i + 1) - 6;
+        const delay = beat('show-full-diagram') + (i + 1) * 4;
+        const p = entranceSpring(frame, fps, delay);
+        return (
+          <g key={`arrow-${i}`} style={{ opacity: p * 0.7 }}>
+            <line x1={fromX} y1={ay} x2={toX - 8} y2={ay} stroke={SLATE_LIGHT} strokeWidth={2} strokeLinecap="round" />
+            <polygon points={`${toX},${ay} ${toX - 8},${ay - 4.5} ${toX - 8},${ay + 4.5}`} fill={SLATE_LIGHT} />
+          </g>
+        );
+      })}
+
+      {/* ── Answer label ── */}
       {(() => {
-        const lastBlockRight = startX + blockCount * (blockW + gap) - gap + 4;
-        const ansArrowEnd = lastBlockRight + 24;
-        const ay = pipeY + pipeH / 2;
+        const fromX = blockRight(5) + 6;
+        const toX = fromX + 22;
         return (
           <g style={{ opacity: diagP }}>
-            <line x1={lastBlockRight} y1={ay} x2={ansArrowEnd - 8} y2={ay} stroke={C.success} strokeWidth={1.5} strokeLinecap="round" />
-            <polygon points={`${ansArrowEnd},${ay} ${ansArrowEnd - 7},${ay - 4} ${ansArrowEnd - 7},${ay + 4}`} fill={C.success} />
-            <text x={ansArrowEnd + 8} y={ay + 1} dominantBaseline="central" fill={C.success} fontSize={FONT_SIZE.md} fontWeight={600} fontFamily={TYPOGRAPHY.label.fontFamily}>Answer</text>
+            <line x1={fromX} y1={ay} x2={toX - 8} y2={ay} stroke={C.success} strokeWidth={2} strokeLinecap="round" />
+            <polygon points={`${toX},${ay} ${toX - 8},${ay - 4.5} ${toX - 8},${ay + 4.5}`} fill={C.success} />
+            <text x={toX + 8} y={ay + 1} dominantBaseline="central"
+              fill={C.success} fontSize={FONT_SIZE.lg} fontWeight={700} fontFamily={TYPOGRAPHY.label.fontFamily}>Answer</text>
           </g>
         );
       })()}
 
-      {/* Straight horizontal arrows between blocks */}
-      {modules.slice(0, -1).map((_, i) => {
-        const fromX = startX + (i + 1) * (blockW + gap) - gap + 4;
-        const toX = startX + (i + 1) * (blockW + gap) - 4;
-        const ay = pipeY + pipeH / 2;
+      {/* ── Self-correction loop — clean L-shape below pipeline ── */}
+      {flowP > 0.05 && (() => {
+        const genCX = blockCenterX(5);
+        const qtCX = blockCenterX(2);
+        const loopTop = pipeY + pipeH + 10;
+        const loopBottom = pipeY + pipeH + 42;
+        const r = 14;
+        const lp = flowP;
+        // Path: down from Generation, left along bottom, up to Query Translation
+        const d = [
+          `M ${genCX} ${loopTop}`,
+          `L ${genCX} ${loopBottom - r}`,
+          `Q ${genCX} ${loopBottom} ${genCX - r} ${loopBottom}`,
+          `L ${qtCX + r} ${loopBottom}`,
+          `Q ${qtCX} ${loopBottom} ${qtCX} ${loopBottom - r}`,
+          `L ${qtCX} ${loopTop}`,
+        ].join(' ');
         return (
-          <g key={`a-${i}`} style={{ opacity: diagP }}>
-            <line x1={fromX} y1={ay} x2={toX - 8} y2={ay} stroke={C.cardStroke} strokeWidth={1.5} strokeLinecap="round" />
-            <polygon points={`${toX},${ay} ${toX - 7},${ay - 4} ${toX - 7},${ay + 4}`} fill={C.cardStroke} />
-          </g>
-        );
-      })}
-
-      {/* DashFlow */}
-      {frame >= beat('animate-flow') && (
-        <DashFlow
-          from={{ x: startX, y: dashY }}
-          to={{ x: startX + blockCount * (blockW + gap) - gap, y: dashY }}
-          enterAt={beat('animate-flow')} color={C.blue} strokeWidth={2} speed={40}
-        />
-      )}
-
-      {/* Self-correction loop — box-style L-shaped path, well below blocks */}
-      {frame >= beat('animate-flow') && (() => {
-        const genRight = startX + 5 * (blockW + gap) + blockW / 2;
-        const qtLeft = startX + 2 * (blockW + gap) + blockW / 2;
-        const loopY = pipeY + pipeH + 14;
-        const loopBottomY = pipeY + pipeH + 46;
-        const r = 12; // corner radius
-        const lp = entranceSpring(frame, fps, beat('animate-flow'));
-        // Box path: down from gen, horizontal left, up to qt
-        const d = `M ${genRight} ${loopY} L ${genRight} ${loopBottomY - r} Q ${genRight} ${loopBottomY} ${genRight - r} ${loopBottomY} L ${qtLeft + r} ${loopBottomY} Q ${qtLeft} ${loopBottomY} ${qtLeft} ${loopBottomY - r} L ${qtLeft} ${loopY}`;
-        return (
-          <g style={{ opacity: lp * 0.6 }}>
+          <g style={{ opacity: lp * 0.5 }}>
             <path d={d} fill="none" stroke={C.generation} strokeWidth={1.5} strokeDasharray="6 4" strokeLinecap="round" />
-            {/* Arrowhead pointing up at qt */}
-            <polygon points={`${qtLeft},${loopY - 2} ${qtLeft - 4},${loopY + 6} ${qtLeft + 4},${loopY + 6}`} fill={C.generation} />
-            {/* Label centered on bottom segment */}
-            <rect x={(genRight + qtLeft) / 2 - 70} y={loopBottomY - 12} width={140} height={20} rx={4} fill={C.bg} />
-            <text x={(genRight + qtLeft) / 2} y={loopBottomY} textAnchor="middle" dominantBaseline="central" fill={C.generation} fontSize={12} fontFamily="monospace" fillOpacity={0.8}>self-correction loop</text>
+            {/* Arrowhead pointing up */}
+            <polygon points={`${qtCX},${loopTop - 2} ${qtCX - 5},${loopTop + 7} ${qtCX + 5},${loopTop + 7}`} fill={C.generation} fillOpacity={0.6} />
+            {/* Label with background */}
+            <rect x={(genCX + qtCX) / 2 - 74} y={loopBottom - 11} width={148} height={20} rx={4} fill={C.bg} />
+            <text x={(genCX + qtCX) / 2} y={loopBottom + 1} textAnchor="middle" dominantBaseline="central"
+              fill={C.generation} fontSize={12} fontFamily="monospace" fillOpacity={0.7}>self-correction loop</text>
           </g>
         );
       })()}
 
-      {/* Incremental adoption */}
-      {frame >= beat('show-incremental') && (
+      {/* ── Incremental adoption card ── */}
+      {incP > 0.05 && (
         <g>
-          <rect x={incX - 16} y={incStartY - 24} width={incMaxW + 32} height={steps.length * incRowH + 56} rx={12} fill={C.cardFill} stroke={C.cardStroke} strokeWidth={1} style={{ opacity: incP }} />
-          <text x={incX} y={incStartY} fill={C.dark} fontSize={FONT_SIZE.lg} fontWeight={700} fontFamily={TYPOGRAPHY.heading.fontFamily} style={{ opacity: incP }}>Incremental Adoption</text>
-          {steps.map((step, i) => (
-            <StepRow
-              key={i} x={incX} y={incStartY + 22 + i * incRowH}
-              num={i + 1} text={step.text} when={step.when}
-              enterAt={beat('show-incremental')} maxW={incMaxW}
-            />
-          ))}
+          <rect x={incX - 16} y={incStartY - 24} width={incMaxW + 32} height={steps.length * incRowH + 56} rx={12}
+            fill={C.white} stroke={SLATE_LIGHT} strokeWidth={1} style={{ opacity: incP }} />
+          <text x={incX} y={incStartY} fill={SLATE} fontSize={FONT_SIZE.lg} fontWeight={700}
+            fontFamily={TYPOGRAPHY.heading.fontFamily} style={{ opacity: incP }}>Incremental Adoption</text>
+
+          {steps.map((step, i) => {
+            const sp = entranceSpring(frame, fps, beat('show-incremental') + i * 3);
+            const ry = incStartY + 22 + i * incRowH;
+            return (
+              <g key={i} style={{ opacity: sp }}>
+                <circle cx={incX + 12} cy={ry + 10} r={12} fill={C.blue} fillOpacity={0.06} stroke={C.blue} strokeWidth={1} />
+                <text x={incX + 12} y={ry + 11} textAnchor="middle" dominantBaseline="central"
+                  fill={C.blue} fontSize={FONT_SIZE.xs} fontWeight={700}>{i + 1}</text>
+                <text x={incX + 32} y={ry + 11} dominantBaseline="central"
+                  fill={SLATE} fontSize={FONT_SIZE.md} fontWeight={500} fontFamily={TYPOGRAPHY.label.fontFamily}>{step.text}</text>
+                <text x={incX + incMaxW} y={ry + 11} textAnchor="end" dominantBaseline="central"
+                  fill={SLATE_MID} fontSize={FONT_SIZE.xs} fontFamily="monospace">{step.when}</text>
+              </g>
+            );
+          })}
         </g>
       )}
 
-      {/* Final text */}
+      {/* ── Final text ── */}
       <g style={{ opacity: finalP }}>
-        <text x={grid.center().x} y={grid.y(0.92)} textAnchor="middle" fill={C.dark} fontSize={FONT_SIZE['2xl']} fontWeight={700} fontFamily={TYPOGRAPHY.heading.fontFamily}>Production RAG</text>
-        <text x={grid.center().x} y={grid.y(0.96)} textAnchor="middle" fill={C.mid} fontSize={FONT_SIZE.lg} fontWeight={400} fontFamily={TYPOGRAPHY.body.fontFamily}>Six modules, incrementally adoptable.</text>
+        <text x={grid.center().x} y={grid.y(0.92)} textAnchor="middle" fill={SLATE}
+          fontSize={FONT_SIZE['2xl']} fontWeight={700} fontFamily={TYPOGRAPHY.heading.fontFamily}>Production RAG</text>
+        <text x={grid.center().x} y={grid.y(0.96)} textAnchor="middle" fill={SLATE_MID}
+          fontSize={FONT_SIZE.lg} fontWeight={400} fontFamily={TYPOGRAPHY.body.fontFamily}>Six modules, incrementally adoptable.</text>
       </g>
     </g>
   );
