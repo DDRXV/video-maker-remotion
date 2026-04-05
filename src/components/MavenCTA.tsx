@@ -34,10 +34,10 @@ export const MavenCTA: React.FC<MavenCTAProps> = ({ variant }) => {
   const cardX = cx - cardW / 2;
   const cardY = cy - cardH / 2 + 20;
 
-  // Screenshot area (left side)
-  const ssW = 720;
-  const ssH = 480;
-  const ssX = cardX + 60;
+  // Screenshot area (left side) — wide enough to show full image
+  const ssW = 780;
+  const ssH = 520;
+  const ssX = cardX + 40;
   const ssY = cardY + (cardH - ssH) / 2;
 
   // Right side content
@@ -130,7 +130,7 @@ export const MavenCTA: React.FC<MavenCTAProps> = ({ variant }) => {
           width={ssW}
           height={ssH}
           clipPath="url(#ss-clip)"
-          preserveAspectRatio="xMidYMid slice"
+          preserveAspectRatio="xMinYMin meet"
         />
       </g>
 
