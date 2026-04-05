@@ -777,25 +777,22 @@ const View5: React.FC<{ opacity: number }> = ({ opacity }) => {
         const sx = startX + i * (stageW + gapW);
         const delay = beat('show-summary') + i * 3;
         const sp = snappySpring(frame, fps, delay);
-        const ty = interpolate(sp, [0, 1], [16, 0], { extrapolateRight: 'clamp' });
-
         return (
-          <g key={i}>
-            <g style={{ opacity: sp, transform: `translateY(${ty}px)` }}>
-              <rect x={sx - 3} y={pipeY - 3} width={stageW + 6} height={stageH + 6} rx={13} fill={s.color} fillOpacity={0.03} />
-              <rect x={sx} y={pipeY} width={stageW} height={stageH} rx={10} fill={P.card} stroke={s.color} strokeWidth={1.5} strokeOpacity={0.4} />
-              <rect x={sx} y={pipeY} width={4} height={stageH} rx={2} fill={s.color} fillOpacity={0.5} />
-              <circle cx={sx + stageW - 16} cy={pipeY + 14} r={10} fill={s.color} fillOpacity={0.08} stroke={s.color} strokeWidth={0.8} strokeOpacity={0.3} />
-              <text x={sx + stageW - 16} y={pipeY + 15} textAnchor="middle" dominantBaseline="central" fill={s.color} fontSize={10} fontWeight={700}>{i + 1}</text>
-              {/* Mini illustration */}
-              {s.icon(sx)}
-              {/* Label + sub at bottom */}
-              <text x={sx + 14} y={pipeY + stageH - 30} fill={P.text} fontSize={15} fontWeight={700} fontFamily={TYPOGRAPHY.label.fontFamily}>{s.label}</text>
-              <text x={sx + 14} y={pipeY + stageH - 12} fill={P.textLight} fontSize={12} fontFamily="monospace">{s.sub}</text>
-            </g>
-            {/* Arrow */}
+          <g key={i} style={{ opacity: sp }}>
+            {/* Card */}
+            <rect x={sx - 3} y={pipeY - 3} width={stageW + 6} height={stageH + 6} rx={13} fill={s.color} fillOpacity={0.03} />
+            <rect x={sx} y={pipeY} width={stageW} height={stageH} rx={10} fill={P.card} stroke={s.color} strokeWidth={1.5} strokeOpacity={0.4} />
+            <rect x={sx} y={pipeY} width={4} height={stageH} rx={2} fill={s.color} fillOpacity={0.5} />
+            <circle cx={sx + stageW - 16} cy={pipeY + 14} r={10} fill={s.color} fillOpacity={0.08} stroke={s.color} strokeWidth={0.8} strokeOpacity={0.3} />
+            <text x={sx + stageW - 16} y={pipeY + 15} textAnchor="middle" dominantBaseline="central" fill={s.color} fontSize={10} fontWeight={700}>{i + 1}</text>
+            {/* Mini illustration */}
+            {s.icon(sx)}
+            {/* Label + sub at bottom */}
+            <text x={sx + 14} y={pipeY + stageH - 30} fill={P.text} fontSize={15} fontWeight={700} fontFamily={TYPOGRAPHY.label.fontFamily}>{s.label}</text>
+            <text x={sx + 14} y={pipeY + stageH - 12} fill={P.textLight} fontSize={12} fontFamily="monospace">{s.sub}</text>
+            {/* Arrow to next — perfectly horizontal */}
             {i < stageCount - 1 && (
-              <g style={{ opacity: sp * 0.5 }}>
+              <g>
                 <line x1={sx + stageW + 3} y1={pipeY + stageH / 2} x2={sx + stageW + gapW - 8} y2={pipeY + stageH / 2}
                   stroke={i === dividerAfter ? P.green : P.stroke} strokeWidth={1.5} strokeLinecap="round"
                   strokeDasharray={i === dividerAfter ? '5 3' : undefined} />
