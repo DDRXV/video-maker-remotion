@@ -3,15 +3,15 @@ import { staticFile } from 'remotion';
 import { CANVAS } from '../design-system/tokens';
 
 /**
- * Top-right branding: Logo + "Rajesh P, Founder Codepup AI"
- * Prominent, full opacity, every frame. Like ByteByteGo.
+ * Top-right branding — prominent like ByteByteGo.
+ * Logo (80px) + "Rajesh P, Founder Codepup AI" in large text.
  */
 export const Watermark: React.FC = () => {
-  const logoSize = 44;
-  const rightPad = 40;
-  const topPad = 28;
-  const textX = CANVAS.width - rightPad - logoSize - 12;
+  const logoSize = 80;
+  const rightPad = 36;
+  const topPad = 20;
   const logoX = CANVAS.width - rightPad - logoSize;
+  const textX = logoX - 16;
   const cy = topPad + logoSize / 2;
 
   return (
@@ -19,11 +19,11 @@ export const Watermark: React.FC = () => {
       {/* Text — right-aligned before logo */}
       <text
         x={textX}
-        y={cy - 4}
+        y={cy - 6}
         textAnchor="end"
         fill="#1c1917"
-        fillOpacity={0.7}
-        fontSize={16}
+        fillOpacity={0.8}
+        fontSize={24}
         fontWeight={600}
         fontFamily="Inter, sans-serif"
         letterSpacing={0.3}
@@ -32,14 +32,13 @@ export const Watermark: React.FC = () => {
       </text>
       <text
         x={textX}
-        y={cy + 16}
+        y={cy + 24}
         textAnchor="end"
         fill="#C75B2A"
-        fillOpacity={0.8}
-        fontSize={16}
+        fontSize={26}
         fontWeight={700}
         fontFamily="Inter, sans-serif"
-        letterSpacing={0.3}
+        letterSpacing={0.5}
       >
         Codepup AI
       </text>
@@ -52,7 +51,6 @@ export const Watermark: React.FC = () => {
         width={logoSize}
         height={logoSize}
         preserveAspectRatio="xMidYMid meet"
-        opacity={0.85}
       />
     </g>
   );
